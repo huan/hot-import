@@ -11,6 +11,7 @@ script:
   - node --version
   - npm --version
   - npm test
+  - npm run dist
   - npm run test:npm && echo 'Npm packing test passed'
 
 notifications:
