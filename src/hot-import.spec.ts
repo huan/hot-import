@@ -14,13 +14,13 @@ import {
   cloneProperties,
   hotImport,
   importFile,
-  // initProxyModule,
+  initProxyModule,
   // makeHot,
   makeCold,
   // makeColdAll,
   moduleStore,
   newCall,
-  // proxyStore,
+  proxyStore,
   purgeRequireCache,
   refreshImport,
   // restoreRequireCache,
@@ -69,7 +69,6 @@ test('hotImport()', async t => {
       }
 
       const result = new cls(EXPECTED_TEXT)
-      // console.log('result', result)
       t.equal(result.text, EXPECTED_TEXT, 'should get expected values from instance of class in module')
       t.equal(result.id, info.returnValue, 'should import module class with right id:' + info.returnValue)
     }
@@ -77,15 +76,6 @@ test('hotImport()', async t => {
       makeCold(file)
     }
   })
-
-  // for (const info of changingModuleFixtures()) {
-  // t.test('class constructor', async t => {
-  //   for (const info of classModuleFixture()) {
-  //     const m = await hotImport(info.file)
-  //     const i = new m(EXPECTED_TEXT)
-  //     t.equal(i.text, EXPECTED_TEXT, 'should import class & instanciated right')
-  //   }
-  // })
 })
 
 test('importFile()', async t => {
@@ -114,7 +104,9 @@ test('refreshImport()', async t => {
   for (const info of changingClassModuleFixtures()) {
     if (!cls) {
       cls = await importFile(info.file)
+
       moduleStore[info.file] = cls
+      proxyStore [info.file] = initProxyModule(info.file)
     } else {
       await refreshImport(info.file)
       t.notEqual(moduleStore[info.file], cls, 'should be refreshed to new value')
