@@ -21,6 +21,7 @@ notifications:
 before_deploy:
   - npm version
   - grep version package.json
+  - npm run dist
 
 deploy:
   provider: npm
