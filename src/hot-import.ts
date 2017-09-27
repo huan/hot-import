@@ -5,48 +5,16 @@ import * as fs      from 'fs'
 import * as path    from 'path'
 
 const callerPath      = require('caller-path')
-import { FSWatcher }  from 'chokidar'
 
 import { log }        from 'brolog'
 
-export interface ModuleStore {
+export interface KVStore {
   [id: string]: any
 }
 
-export const moduleStore: ModuleStore = {}
-export const proxyStore : ModuleStore = {}
-
-export const fsWatcher = initFileWatcher(refreshImport)
-
-export function initFileWatcher(changeListener: (absFilePath: string) => void): FSWatcher {
-  log.verbose('HotImport', 'initFileWatcher()')
-
-  const watcher = new FSWatcher()
-
-  watcher.add('/tmp/zixia/a.txt')
-
-  watcher
-  .on('add', filePath => {
-    log.verbose('HotImport', `initFileWatcher() watcher.on(add) File ${filePath} has been added`)
-  })
-  .on('error', (error, filePath) => {
-    log.error('HotImport', 'initFileWatcher() watcher.on(error) %s',
-                            filePath, error)
-    log.error('HotImport', 'initFileWatcher() watcher.on(error) watcher.unwatch(%s)', filePath)
-    watcher.unwatch(filePath)
-  })
-  .on('ready', () => log.verbose('HotImport', 'initFileWatcher() watcher.on(ready)'))
-  .on('raw', (event, filePath, details) => {
-    log.verbose('HotImport', 'Raw event info: %s, %s, %s', event, filePath, details)
-  });
-
-  watcher.on('change', filePath => {
-    log.verbose('HotImport', 'initFileWatcher() watcher.on(change) %s', filePath)
-    changeListener(filePath)
-  })
-
-  return watcher
-}
+export const moduleStore  = {} as KVStore
+export const proxyStore   = {} as KVStore
+export const watcherStore = {} as KVStore
 
 export async function refreshImport(absFilePath: string): Promise<void> {
   log.verbose('HotImport', 'refreshImport(%s)', absFilePath)
@@ -79,17 +47,59 @@ export async function hotImport(filePathRelativeToCaller: string): Promise<any> 
     moduleStore[absFilePath] = newModule
     proxyStore[absFilePath]  = initProxyModule(absFilePath)
     cloneProperties(proxyStore[absFilePath], moduleStore[absFilePath])
-    fsWatcher.add(absFilePath)
-    fsWatcher.on('change', filePath => console.log('XXX', filePath))
 
-    // fsWatcher.on(ready) must be called after .add(path)
-    // await new Promise(resolve => fsWatcher.once('ready', resolve))
-    await new Promise(setImmediate)
-
-    console.log('Watched', fsWatcher.getWatched())
+    makeHot(absFilePath)
   }
 
   return proxyStore[absFilePath]
+}
+
+export function makeHot(absFilePath: string): void {
+  log.verbose('HotImport', 'makeHot(%s)', absFilePath)
+
+  if (watcherStore[absFilePath]) {
+    throw new Error(`makeHot(${absFilePath}) it's already hot!`)
+  }
+  const watcher = fs.watch(absFilePath, event => {
+    if (event !== 'change') {
+      return
+    }
+    let size = 0
+    try {
+      size = fs.statSync(absFilePath).size
+    } catch (e) {
+      log.warn('HotImport', 'hotImport() fs.statSync(%s) exception: %s',
+                            absFilePath, e)
+    }
+    if (size === 0) {
+      log.warn('HotImport', 'hotImport() fs.statSync(%s) size:0', absFilePath)
+      return
+    }
+    log.verbose('HotImport', 'hotImport() fs.watch(%s, %s)', absFilePath, event)
+    refreshImport(absFilePath)
+  })
+  watcherStore[absFilePath] = watcher
+}
+
+export function makeCold(absFilePath: string): void {
+  log.verbose('HotImport', 'makeCold(%s)', absFilePath)
+  const watcher = watcherStore[absFilePath]
+  if (watcher) {
+    watcher.close()
+    delete watcherStore[absFilePath]
+  } else {
+    log.verbose('HotImport', 'makeCold(%s) already cold.')
+  }
+}
+
+export function makeColdAll(): void {
+  for (const file in watcherStore) {
+    const watcher = watcherStore[file]
+    if (watcher) {
+      watcher.close()
+      delete watcherStore[file]
+    }
+  }
 }
 
 export function cloneProperties(dst: any, src: any) {
