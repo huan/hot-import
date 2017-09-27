@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/zixia/hot-import#readme",
   "dependencies": {
+    "brolog": "^1.2.6",
     "caller-path": "^2.0.0"
   },
   "devDependencies": {
