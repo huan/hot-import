@@ -1,6 +1,6 @@
 {
   "name": "hot-import",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Hot Module Re-Import on Change for Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
