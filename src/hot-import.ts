@@ -1,6 +1,3 @@
-// See:
-// https://github.com/rayosu/hot-require/blob/master/hot-require.js
-// http://blog.chatie.io/developer/2017/03/20/added-hot-reload-for-bots.html
 import * as fs      from 'fs'
 import * as path    from 'path'
 
