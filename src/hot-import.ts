@@ -1,6 +1,7 @@
 // See:
 // https://github.com/rayosu/hot-require/blob/master/hot-require.js
 // http://blog.chatie.io/developer/2017/03/20/added-hot-reload-for-bots.html
+import * as fs      from 'fs'
 import * as path    from 'path'
 
 const callerPath      = require('caller-path')
@@ -17,8 +18,14 @@ export const proxyStore : ModuleStore = {}
 
 export const fsWatcher = initFileWatcher(refreshImport)
 
-function initFileWatcher(changeListener: (absFilePath: string) => void): FSWatcher {
+export function initFileWatcher(changeListener: (absFilePath: string) => void): FSWatcher {
+  log.verbose('HotImport', 'initFileWatcher()')
+
   const watcher = new FSWatcher()
+
+  watcher.add('/tmp/zixia/a.txt')
+
+  watcher
   .on('add', filePath => {
     log.verbose('HotImport', `initFileWatcher() watcher.on(add) File ${filePath} has been added`)
   })
@@ -28,8 +35,16 @@ function initFileWatcher(changeListener: (absFilePath: string) => void): FSWatch
     log.error('HotImport', 'initFileWatcher() watcher.on(error) watcher.unwatch(%s)', filePath)
     watcher.unwatch(filePath)
   })
+  .on('ready', () => log.verbose('HotImport', 'initFileWatcher() watcher.on(ready)'))
+  .on('raw', (event, filePath, details) => {
+    log.verbose('HotImport', 'Raw event info: %s, %s, %s', event, filePath, details)
+  });
 
-  watcher.on('change', changeListener)
+  watcher.on('change', filePath => {
+    log.verbose('HotImport', 'initFileWatcher() watcher.on(change) %s', filePath)
+    changeListener(filePath)
+  })
+
   return watcher
 }
 
@@ -59,15 +74,17 @@ export async function hotImport(filePathRelativeToCaller: string): Promise<any> 
   const absFilePath = callerResolve(filePathRelativeToCaller)
 
   if (!(absFilePath in moduleStore)) {
-    log.verbose('HotImport', 'hotImport(%s) init theModule...', absFilePath)
+    log.verbose('HotImport', 'hotImport() init moduleStore[%s]...', absFilePath)
     const newModule = await importFile(absFilePath)
     moduleStore[absFilePath] = newModule
     proxyStore[absFilePath]  = initProxyModule(absFilePath)
     cloneProperties(proxyStore[absFilePath], moduleStore[absFilePath])
     fsWatcher.add(absFilePath)
+    fsWatcher.on('change', filePath => console.log('XXX', filePath))
 
     // fsWatcher.on(ready) must be called after .add(path)
-    await new Promise(resolve => fsWatcher.once('ready', resolve))
+    // await new Promise(resolve => fsWatcher.once('ready', resolve))
+    await new Promise(setImmediate)
 
     console.log('Watched', fsWatcher.getWatched())
   }
