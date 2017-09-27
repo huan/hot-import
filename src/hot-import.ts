@@ -8,60 +8,74 @@ import { FSWatcher }  from 'chokidar'
 
 import { log }        from 'brolog'
 
-export let theModule: any
-export function debugSetModule(m: any): void {
-  theModule = m
+export interface ModuleStore {
+  [id: string]: any
 }
 
-export const fsWatcher = initFileWatcher()
+export const moduleStore: ModuleStore = {}
+export const proxyStore : ModuleStore = {}
 
-function initFileWatcher() {
+export const fsWatcher = initFileWatcher(refreshImport)
+
+function initFileWatcher(changeListener: (absFilePath: string) => void): FSWatcher {
   const watcher = new FSWatcher()
-
-  watcher
-  .on('add', filePath => log.verbose('HotImport', `watcher.on(add) File ${filePath} has been added`))
-  .on('change', async filePath => {
-    log.verbose('HotImport', 'watcher.on(change, %s)', filePath)
-
-    try {
-      const newModule = await importFile(filePath)
-      purgeRequireCache(filePath)
-      theModule = newModule
-      cloneProperties(theModule, moduleProxy)
-      log.verbose('HotImport', 'watcher.on(change, %s) Hot Module Re-Imported', filePath)
-    } catch (e) {
-      log.error('HotImport', 'watcher.on(change, %s) exception: %s', filePath, e)
-    }
+  .on('add', filePath => {
+    log.verbose('HotImport', `initFileWatcher() watcher.on(add) File ${filePath} has been added`)
   })
   .on('error', (error, filePath) => {
-    log.error('HotImport', 'watchFile(%s) watcher.on(error) '
-                            + 'closing watcher because: %s',
+    log.error('HotImport', 'initFileWatcher() watcher.on(error) %s',
                             filePath, error)
-    watcher.close()
+    log.error('HotImport', 'initFileWatcher() watcher.on(error) watcher.unwatch(%s)', filePath)
+    watcher.unwatch(filePath)
   })
 
+  watcher.on('change', changeListener)
   return watcher
 }
 
-export async function hotImport(id: string): Promise<any> {
-  log.verbose('HotImport', 'hotImport(%s)', id)
+export async function refreshImport(absFilePath: string): Promise<void> {
+  log.verbose('HotImport', 'refreshImport(%s)', absFilePath)
+  const oldCache = purgeRequireCache(absFilePath)
+  try {
+    const refreshedModule     = await importFile(absFilePath)
+    moduleStore[absFilePath]  = refreshedModule
 
-  if (!theModule) {
-    log.verbose('HotImport', 'hotImport(%s) init theModule...', id)
-    const absoluteFilePath = callerResolve(id)
-    theModule = await importFile(absoluteFilePath)
-    cloneProperties(theModule, moduleProxy)
-    fsWatcher.add(absoluteFilePath)
+    cloneProperties(
+      proxyStore[absFilePath],
+      moduleStore[absFilePath],
+    )
+
+    log.verbose('HotImport', 'refreshImport(%s) Hot Module Re-Imported', absFilePath)
+  } catch (e) {
+    log.error('HotImport', 'refreshImport(%s) exception: %s', absFilePath, e)
+    restoreRequireCache(absFilePath, oldCache)
+    log.info('HotImport', 'refreshImport(%s) keep using the latest usable version', absFilePath)
+  }
+}
+
+export async function hotImport(filePathRelativeToCaller: string): Promise<any> {
+  log.verbose('HotImport', 'hotImport(%s)', filePathRelativeToCaller)
+
+  const absFilePath = callerResolve(filePathRelativeToCaller)
+
+  if (!(absFilePath in moduleStore)) {
+    log.verbose('HotImport', 'hotImport(%s) init theModule...', absFilePath)
+    const newModule = await importFile(absFilePath)
+    moduleStore[absFilePath] = newModule
+    proxyStore[absFilePath]  = initProxyModule(absFilePath)
+    cloneProperties(proxyStore[absFilePath], moduleStore[absFilePath])
+    fsWatcher.add(absFilePath)
 
     // fsWatcher.on(ready) must be called after .add(path)
     await new Promise(resolve => fsWatcher.once('ready', resolve))
 
     console.log('Watched', fsWatcher.getWatched())
   }
-  return moduleProxy
+
+  return proxyStore[absFilePath]
 }
 
-export function cloneProperties(src: any, dst: any) {
+export function cloneProperties(dst: any, src: any) {
   log.verbose('HotImport', 'cloneProperties()')
 
   for (const prop in src) {
@@ -83,11 +97,11 @@ export function callerResolve(id: string): string {
   const callerFile = callerPath()
   const callerDir  = path.dirname(callerFile)
 
-  const absoluteFilename = path.resolve(
+  const absFilename = path.resolve(
     callerDir,
     id,
   )
-  return absoluteFilename
+  return absFilename
 }
 
 // create an object instance (via the new operator),
@@ -98,40 +112,52 @@ export function newCall(cls: any, ..._: any[]) {
   return instance
 }
 
-// export function construct(constructor: any, args?: any[]) {
-//   function F(this: any): void {
-//       constructor.apply(this, args)
-//   }
-//   F.prototype = constructor.prototype
-//   return new (F as any)()
-// }
+export function initProxyModule(absFilePath: string): any {
+  log.verbose('HotImport', 'initProxyModule(%s)', absFilePath)
 
-export function moduleProxy(this: any, ...args: any[]): any {
-  if (!theModule) {
-    throw new Error('theModule not set!')
+  if (!(absFilePath in moduleStore)) {
+    throw new Error(`moduleStore has no ${absFilePath}!`)
   }
-  if (this) { // for `new HotImport()`
-    return newCall(theModule, ...args)
-  } else {    // for just `hotImport()`
-    return theModule.apply(theModule, args)
+
+  const proxyModule = function (this: any, ...args: any[]): any {
+    if (this) { // for `new HotImport()`
+      return newCall(moduleStore[absFilePath], ...args)
+    } else {    // for just `hotImport()`
+      return moduleStore[absFilePath].apply(moduleStore[absFilePath], args)
+    }
   }
+  return proxyModule
 }
 
-export async function importFile(id: string): Promise<any> {
-  log.verbose('HotImport', 'importFile(%s)', id)
+export async function importFile(absFilePath: string): Promise<any> {
+  log.verbose('HotImport', 'importFile(%s)', absFilePath)
+
+  if (!path.isAbsolute(absFilePath)) {
+    throw new Error('must be absolute path!')
+  }
+
   try {
-    return await import(id)
+    return await import(absFilePath)
   } catch (e) {
-    log.error('HotImport', 'importFile(%s) rejected: %s', id, e)
+    log.error('HotImport', 'importFile(%s) rejected: %s', absFilePath, e)
   }
 }
 
-export function purgeRequireCache(id: string): void {
-  log.verbose('HotImport', 'purgeRequireCache(%s)', id)
-  const mod = require.resolve(id)
-  // console.log('mod', mod)
-  // console.log('cache', require.cache[mod])
+export function purgeRequireCache(absFilePath: string): any {
+  log.verbose('HotImport', 'purgeRequireCache(%s)', absFilePath)
+  const mod = require.resolve(absFilePath)
+  const oldCache = require.cache[mod]
+  if (!oldCache) {
+    throw new Error(`oldCache not found for mod:${mod}`)
+  }
   delete require.cache[mod]
+  return oldCache
+}
+
+export function restoreRequireCache(absFilePath: string, cache: any): void {
+  log.verbose('HotImport', 'restoreRequireCache(%s, cache)', absFilePath)
+  const mod = require.resolve(absFilePath)
+  require.cache[mod] = cache
 }
 
 export default hotImport

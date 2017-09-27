@@ -9,6 +9,8 @@ export interface ModuleInfo {
   returnValue : any,
 }
 
+// Actually the `export = 42` is not supported by hot-import currently.
+// This fixture is only for test purpose.
 export function* changingVariableModuleFixtures(): IterableIterator<ModuleInfo> {
   for (const workDir of tmpDir()) {
     const MODULE_FILE = path.join(
@@ -99,11 +101,13 @@ function* tmpDir(): IterableIterator<string> {
     ),
   )
 
-  yield dir
-
-  rimraf(dir, e => {
-    if (e) {
-      console.error('rimraf error: ', e)
-    }
-  })
+  try {
+    yield dir
+  } finally {
+    rimraf(dir, e => {
+      if (e) {
+        console.error('rimraf error: ', e)
+      }
+    })
+  }
 }

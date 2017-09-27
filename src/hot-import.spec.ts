@@ -12,13 +12,15 @@ import {
 import {
   callerResolve,
   cloneProperties,
-  debugSetModule,
   fsWatcher,
   hotImport,
   importFile,
-  moduleProxy,
+  moduleStore,
   newCall,
+  // proxyStore,
   purgeRequireCache,
+  refreshImport,
+  // restoreRequireCache,
 }                           from './hot-import'
 
 import { log }      from 'brolog'
@@ -51,25 +53,28 @@ test('newCall()', async t => {
 })
 
 // XXX
-test('hotImport()', async t => {
+test.only('hotImport()', async t => {
   t.test('class module', async t => {
     let file, cls
     for (const info of changingClassModuleFixtures()) {
       // wait io finish/chokidar event to be fired
-      await new Promise(resolve => setImmediate(resolve))
+      await new Promise(setImmediate)
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      console.log('info', info)
+      // console.log('info', info)
       if (!cls) {
         file = info.file
         cls = await hotImport(file)
+      } else {
+        t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
       }
-      t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
 
       const result = new cls(EXPECTED_TEXT)
-      console.log('result', result)
+      // console.log('result', result)
       t.equal(result.text, EXPECTED_TEXT, 'should get expected values from instance of class in module')
-      t.equal(result.id, info.returnValue, 'should import module class with right id')
+      t.equal(result.id, info.returnValue, 'should import module class with right id:' + info.returnValue)
+
+      await new Promise(setImmediate)
     }
   })
 
@@ -90,9 +95,9 @@ test('importFile()', async t => {
     for (const info of changingVariableModuleFixtures()) {
       // console.log('info', info)
       // const file = info.file.replace(/\.ts$/i, '')
-      purgeRequireCache(info.file)
       const m = await importFile(info.file)
       t.equal(m, info.returnValue, 'should import file right with returned value ' + info.returnValue)
+      purgeRequireCache(info.file)
     }
   })
   t.test('class', async t => {
@@ -101,22 +106,22 @@ test('importFile()', async t => {
       const result = new m(EXPECTED_TEXT)
       t.equal(result.text, EXPECTED_TEXT, 'should instanciated class with constructor argument')
       t.equal(result.id, info.returnValue, 'should import module class with right id')
+      purgeRequireCache(info.file)
     }
   })
 })
 
-test('moduleProxy()', async t => {
-  const TEST_CLASS = class {
-    constructor(public text: string) {}
+test('refreshImport()', async t => {
+  let cls
+  for (const info of changingClassModuleFixtures()) {
+    if (!cls) {
+      cls = await importFile(info.file)
+      moduleStore[info.file] = cls
+    } else {
+      await refreshImport(info.file)
+      t.notEqual(moduleStore[info.file], cls, 'should be refreshed to new value')
+    }
   }
-
-  debugSetModule(undefined)
-  t.throws(() => moduleProxy(), 'should throw without initialized theModule')
-  t.throws(() => new (moduleProxy as any)(), 'should throw without initialized theModule')
-
-  debugSetModule(TEST_CLASS)
-  const m = new (moduleProxy as any)(EXPECTED_TEXT)
-  t.equal(m.text, EXPECTED_TEXT, 'should instiaciated class with constructor parameter')
 })
 
 test('purgeRequireCache()', async t => {
@@ -137,7 +142,7 @@ test('purgeRequireCache()', async t => {
   }
 })
 
-test('fsWatcher on change', async t => {
+test('fsWatcher', async t => {
   let iteratorCounter = 0
   let changeCounter   = 0
 
@@ -152,13 +157,13 @@ test('fsWatcher on change', async t => {
     }
     iteratorCounter++
     // wait io finish/chokidar event to be fired
-    await new Promise(resolve => setImmediate(resolve))
+    await new Promise(setImmediate)
   }
-  console.log('iteratorCounter', iteratorCounter)
-  console.log('changeCounter', changeCounter)
+  // console.log('iteratorCounter', iteratorCounter)
+  // console.log('changeCounter', changeCounter)
 
   // wait io finish/chokidar event to be fired
-  await new Promise(resolve => setImmediate(resolve))
+  await new Promise(setImmediate)
 
   t.ok(iteratorCounter > 1, 'should loop for at least 2 times')
   t.equal(changeCounter, iteratorCounter - 1, 'should change (iteratorCount - 1) times')
@@ -171,13 +176,13 @@ test('cloneProperties()', async t => {
 
   t.test('object', async t => {
     const dst = {} as any
-    cloneProperties(SRC, dst)
+    cloneProperties(dst, SRC)
     t.equal(dst.text, EXPECTED_TEXT, 'should clone the text property')
   })
 
   t.test('class', async t => {
     const dst = {} as any
-    cloneProperties(SRC_CLASS, dst)
+    cloneProperties(dst, SRC_CLASS)
     t.equal(SRC_CLASS.prototype, dst.prototype, 'should clone the prototype for class')
   })
 })

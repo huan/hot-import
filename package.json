@@ -1,7 +1,7 @@
 {
   "name": "hot-import",
   "version": "0.0.2",
-  "description": "One-Line Dynamic Hot Import for Reload Module on Change in Node.js Edit",
+  "description": "Hot Module Re-Import on Change for Node.js",
   "main": "index.js",
   "directories": {
     "doc": "docs",
