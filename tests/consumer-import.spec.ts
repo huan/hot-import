@@ -2,13 +2,14 @@ import * as path  from 'path'
 
 // tslint:disable:no-shadowed-variable
 import * as test  from 'blue-tape'
+
 // import { log } from 'brolog'
 // log.level('silly')
 
 import hotImport  from '../'
 import {
   callerResolve,
-  makeCold,
+  // makeCold,
 }                 from '../src/hot-import'
 
 const MODULE_RELATIVE_PATH = './fixtures/meaning-of-life'
@@ -17,7 +18,7 @@ test('hotImport', async t => {
   const { MeaningOfLife } = await hotImport(MODULE_RELATIVE_PATH)
   const mol = new MeaningOfLife()
   t.equal(mol.answer, 42, 'should get 42 for meaning of life')
-  makeCold(MODULE_RELATIVE_PATH)
+  await hotImport(MODULE_RELATIVE_PATH, false)
 })
 
 test('callerResolve', async t => {

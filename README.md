@@ -24,21 +24,46 @@ USAGE
 Talk is cheap, show me the code!
 
 ```ts
-import hotImport  from 'hot-import'
+import * as assert  from 'assert'
+import * as fs      from 'fs'
+import * as path    from 'path'
 
-import * as fs    from 'fs'
+import hotImport  from '../'
 
-const MODULE_CODE_42 = 'export default const test = () => 42'
-const MODULE_CODE_17 = 'export default const test = () => 17'
+async function main() {
+  const MODULE_CODE_42 = 'export const answer = () => 42'
+  const MODULE_CODE_17 = 'export const answer = () => 17'
 
-fs.writeFileSync('./mod.js', MODULE_CODE_42)
+  const MODULE_FILE = path.join(__dirname, 'mod.ts')
 
-const mod = hotImport('./mod')
-console.log(mod())  // Output: 42
+  fs.writeFileSync(MODULE_FILE, MODULE_CODE_42)
+  const mod = await hotImport(MODULE_FILE)
 
-fs.writeFileSync('./mod.js', MODULE_CODE_17)
+  const fourtyTwo = mod.answer()
+  assert(fourtyTwo === 42, 'first get 42')
+  console.log(fourtyTwo)  // Output: 42
 
-console.log(mod())  // Output: 17
+  fs.writeFileSync(MODULE_FILE, MODULE_CODE_17)
+  await new Promise(setImmediate) // wait io event loop finish
+
+  const sevenTeen = mod.answer()
+  assert(sevenTeen === 17, 'get 17 after file update & hot reloaded')
+  console.log(sevenTeen)  // Output 17
+
+  await hotImport(MODULE_FILE, false) // stop hot watch
+}
+
+main()
+.catch(console.error)
+```
+
+The above code is in the `example/` directory. Npm script `demo` will run it for you:
+
+```shell
+$ git clone git@github.com:zixia/hot-import.git
+$ cd hot-import
+$ npm install
+$ npm run demo
 ```
 
 SEE ALSO

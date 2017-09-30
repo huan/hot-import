@@ -16,7 +16,7 @@ import {
   importFile,
   initProxyModule,
   // makeHot,
-  makeCold,
+  // makeCold,
   // makeColdAll,
   moduleStore,
   newCall,
@@ -73,7 +73,7 @@ test('hotImport()', async t => {
       t.equal(result.id, info.returnValue, 'should import module class with right id:' + info.returnValue)
     }
     if (file) {
-      makeCold(file)
+      await hotImport(file, false)
     }
   })
 })

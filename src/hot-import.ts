@@ -34,8 +34,16 @@ export async function refreshImport(absFilePath: string): Promise<void> {
   }
 }
 
-export async function hotImport(filePathRelativeToCaller: string): Promise<any> {
-  log.verbose('HotImport', 'hotImport(%s)', filePathRelativeToCaller)
+export async function hotImport(filePathRelativeToCaller: string)               : Promise<any>
+export async function hotImport(filePathRelativeToCaller: string, watch: false) : Promise<void>
+
+export async function hotImport(filePathRelativeToCaller: string, watch = true): Promise<any> {
+  log.verbose('HotImport', 'hotImport(%s, %s)', filePathRelativeToCaller, watch)
+
+  if (!watch) {
+    makeCold(filePathRelativeToCaller)
+    return
+  }
 
   // convert './module' to '${cwd}/module.js'
   const absFilePath = require.resolve(
@@ -174,6 +182,9 @@ export function initProxyModule(absFilePath: string): any {
     if (this) { // for `new HotImport()`
       return newCall(moduleStore[absFilePath], ...args)
     } else {    // for just `hotImport()`
+      if (typeof moduleStore[absFilePath] !== 'function') {
+        throw new TypeError('is not a function')
+      }
       return moduleStore[absFilePath].apply(moduleStore[absFilePath], args)
     }
   }
