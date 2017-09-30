@@ -1,7 +1,8 @@
 import * as fs      from 'fs'
 import * as path    from 'path'
 
-const callerPath      = require('caller-path')
+// const callerPath      = require('caller-path')
+const callsites       = require('callsites')
 
 import { log }        from 'brolog'
 
@@ -36,7 +37,10 @@ export async function refreshImport(absFilePath: string): Promise<void> {
 export async function hotImport(filePathRelativeToCaller: string): Promise<any> {
   log.verbose('HotImport', 'hotImport(%s)', filePathRelativeToCaller)
 
-  const absFilePath = callerResolve(filePathRelativeToCaller)
+  // convert './module' to '${cwd}/module.js'
+  const absFilePath = require.resolve(
+    callerResolve(filePathRelativeToCaller),
+  )
 
   if (!(absFilePath in moduleStore)) {
     log.verbose('HotImport', 'hotImport() init moduleStore[%s]...', absFilePath)
@@ -51,7 +55,10 @@ export async function hotImport(filePathRelativeToCaller: string): Promise<any> 
   return proxyStore[absFilePath]
 }
 
-export function makeHot(absFilePath: string): void {
+export function makeHot(filePath: string): void {
+  const absFilePath = require.resolve(
+    callerResolve(filePath),
+  )
   log.verbose('HotImport', 'makeHot(%s)', absFilePath)
 
   if (watcherStore[absFilePath]) {
@@ -78,14 +85,18 @@ export function makeHot(absFilePath: string): void {
   watcherStore[absFilePath] = watcher
 }
 
-export function makeCold(absFilePath: string): void {
+export function makeCold(filePath: string): void {
+  const absFilePath = require.resolve(
+    callerResolve(filePath),
+  )
   log.verbose('HotImport', 'makeCold(%s)', absFilePath)
+
   const watcher = watcherStore[absFilePath]
   if (watcher) {
     watcher.close()
     delete watcherStore[absFilePath]
   } else {
-    log.verbose('HotImport', 'makeCold(%s) already cold.')
+    log.verbose('HotImport', 'makeCold(%s) already cold.', absFilePath)
   }
 }
 
@@ -113,17 +124,33 @@ export function cloneProperties(dst: any, src: any) {
 }
 
 // resolve filename based on caller's __dirname
-export function callerResolve(id: string): string {
-  if (path.isAbsolute(id)) {
-    return id
+export function callerResolve(filePath: string): string {
+  if (path.isAbsolute(filePath)) {
+    return filePath
   }
 
-  const callerFile = callerPath()
+  let callerFile: string | undefined
+  for (const callsite of callsites()) {
+    const file = callsite.getFileName()
+    const type = callsite.getTypeName()
+
+    if (file && type) {
+      if (file === __filename) {
+        continue
+      }
+      callerFile = file
+      break
+    }
+  }
+
+  if (!callerFile) {
+    throw new Error('not found caller file?')
+  }
   const callerDir  = path.dirname(callerFile)
 
   const absFilename = path.resolve(
     callerDir,
-    id,
+    filePath,
   )
   return absFilename
 }
