@@ -2,8 +2,8 @@ import * as path  from 'path'
 
 // tslint:disable:no-shadowed-variable
 import * as test  from 'blue-tape'
-import { log } from 'brolog'
-log.level('silly')
+// import { log } from 'brolog'
+// log.level('silly')
 
 import hotImport  from '../'
 import {
