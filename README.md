@@ -31,10 +31,10 @@ import * as path    from 'path'
 import hotImport  from '../'
 
 async function main() {
-  const MODULE_CODE_42 = 'export const answer = () => 42'
-  const MODULE_CODE_17 = 'export const answer = () => 17'
+  const MODULE_CODE_42 = 'exports.answer = () => 42'
+  const MODULE_CODE_17 = 'exports.answer = () => 17'
 
-  const MODULE_FILE = path.join(__dirname, 'mod.ts')
+  const MODULE_FILE = path.join(__dirname, 't.js')
 
   fs.writeFileSync(MODULE_FILE, MODULE_CODE_42)
   const mod = await hotImport(MODULE_FILE)
@@ -55,6 +55,13 @@ async function main() {
 
 main()
 .catch(console.error)
+```
+
+Output:
+
+```shell
+42
+17
 ```
 
 The above code is in the `example/` directory. Npm script `demo` will run it for you:

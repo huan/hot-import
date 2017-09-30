@@ -8,10 +8,10 @@ import hotImport  from '../'
 // log.level('silly')
 
 async function main() {
-  const MODULE_CODE_42 = 'export const answer = () => 42'
-  const MODULE_CODE_17 = 'export const answer = () => 17'
+  const MODULE_CODE_42 = 'exports.answer = () => 42'
+  const MODULE_CODE_17 = 'exports.answer = () => 17'
 
-  const MODULE_FILE = path.join(__dirname, 'mod.ts')
+  const MODULE_FILE = path.join(__dirname, 't.js')
 
   fs.writeFileSync(MODULE_FILE, MODULE_CODE_42)
   const mod = await hotImport(MODULE_FILE)
