@@ -195,13 +195,15 @@ export function initProxyModule(absFilePath: string): any {
   }
 
   const proxyModule = function (this: any, ...args: any[]): any {
-    if (this) { // for `new HotImport()`
+    if (new.target) { // https://stackoverflow.com/a/31060154/1123955
+      // for `new HotMod()`
       return newCall(moduleStore[absFilePath], ...args)
-    } else {    // for just `hotImport()`
+    } else {
+      // for just `hotMethod()`
       if (typeof moduleStore[absFilePath] !== 'function') {
         throw new TypeError('is not a function')
       }
-      return moduleStore[absFilePath].apply(moduleStore[absFilePath], args)
+      return moduleStore[absFilePath].apply(this, args)
     }
   }
   return proxyModule
