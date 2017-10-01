@@ -137,9 +137,14 @@ export function cloneProperties(dst: any, src: any) {
 }
 
 // resolve filename based on caller's __dirname
-export function callerResolve(filePath: string): string {
+export function callerResolve(filePath: string, callerFileExcept?: string): string {
   if (path.isAbsolute(filePath)) {
     return filePath
+  }
+
+  const fileSkipList = [__filename]
+  if (callerFileExcept) {
+    fileSkipList.push(callerFileExcept)
   }
 
   let callerFile: string | undefined
@@ -148,7 +153,9 @@ export function callerResolve(filePath: string): string {
     const type = callsite.getTypeName()
 
     if (file && type) {
-      if (file === __filename) {
+      let skip = false
+      fileSkipList.some(skipFile => !!(skip = (skipFile === file)))
+      if (skip) {
         continue
       }
       callerFile = file
@@ -161,11 +168,11 @@ export function callerResolve(filePath: string): string {
   }
   const callerDir  = path.dirname(callerFile)
 
-  const absFilename = path.resolve(
+  const absFilePath = path.resolve(
     callerDir,
     filePath,
   )
-  return absFilename
+  return absFilePath
 }
 
 // create an object instance (via the new operator),

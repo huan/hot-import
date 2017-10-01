@@ -46,6 +46,11 @@ test('callerResolve()', async t => {
     const filePath = callerResolve(ABSOLUTE_FILE_PATH)
     t.equal(filePath, ABSOLUTE_FILE_PATH, 'should keep absolute as it is')
   })
+  t.test('callerExceptFile', async t => {
+    const filePath = callerResolve(RELATIVE_FILE_PATH, __filename)
+    // console.log(filePath)
+    t.assert(filePath.endsWith('/node_modules/tape/lib/test'), 'except the current file name')
+  })
 })
 
 test('newCall()', async t => {
