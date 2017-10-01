@@ -29,31 +29,37 @@ async function write(file: string, data: string | number): Promise<void> {
 }
 
 async function watch(
-  file: string,
-  cbRename: Function,
-  cbChange: Function,
+  file     : string,
+  cbRename : Function,
+  cbChange : Function,
 ): Promise<fs.FSWatcher> {
-  const watcher = fs.watch(file, event => {
-    log.verbose('TestFsWatch', 'watch(%s) fs.watch() event: %s', file, event)
-    if (event === 'change') {
-      let size
-      try {
-        size = fs.statSync(file).size
-      } catch (e) {
-        log.verbose('TestFsWatch', 'watch(%s) fs.watch() fs.statSync() exception: %s', e)
-        return
-      }
-      if (!size) {
-        return
-      }
-      cbChange()
-    } else if (event === 'rename') {
-      cbRename()
-    }
-  })
+  const watcher = fs.watch(file, onEvent)
   // wait all io event loop to be cleared before return watcher
   await new Promise(setImmediate)
   return watcher
+
+  function onEvent(event: 'change' | 'rename'): void {
+    log.verbose('TestFsWatch', 'watch(%s) fs.watch() event: %s', file, event)
+    if (event === 'change') {
+      onEventChange()
+    } else if (event === 'rename') {
+      cbRename()
+    }
+  }
+
+  function onEventChange() {
+    let size
+    try {
+      size = fs.statSync(file).size
+    } catch (e) {
+      log.verbose('TestFsWatch', 'watch(%s) fs.watch() fs.statSync() exception: %s', e)
+      return
+    }
+    if (!size) {
+      return
+    }
+    cbChange()
+  }
 }
 
 test('1/4. fs.writeFileSync then fs.writeFile', async t => {
