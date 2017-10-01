@@ -21,14 +21,14 @@ export function* changingVariableModuleFixtures(): IterableIterator<ModuleInfo> 
     const EXPECTED_CHANGED_TEXT  = 'changed'
 
     try {
-      fs.writeFileSync(MODULE_FILE, `export = '${EXPECTED_ORIGINAL_TEXT}'`)
+      fs.writeFileSync(MODULE_FILE, `export const answer = '${EXPECTED_ORIGINAL_TEXT}'`)
 
       yield {
         file        : MODULE_FILE,
         returnValue : EXPECTED_ORIGINAL_TEXT,
       }
 
-      fs.writeFileSync(MODULE_FILE, `export = '${EXPECTED_CHANGED_TEXT}'`)
+      fs.writeFileSync(MODULE_FILE, `export const answer = '${EXPECTED_CHANGED_TEXT}'`)
 
       yield {
         file        : MODULE_FILE,

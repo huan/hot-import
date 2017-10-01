@@ -6,17 +6,17 @@ import * as test  from 'blue-tape'
 // import { log } from 'brolog'
 // log.level('silly')
 
-import hotImport  from '../'
 import {
   callerResolve,
   // makeCold,
 }                 from '../src/hot-import'
+import hotImport  from '../'
 
 const MODULE_RELATIVE_PATH = './fixtures/meaning-of-life'
 
 test('hotImport', async t => {
-  const { MeaningOfLife } = await hotImport(MODULE_RELATIVE_PATH)
-  const mol = new MeaningOfLife()
+  const hotMod = await hotImport(MODULE_RELATIVE_PATH)
+  const mol = new hotMod.MeaningOfLife()
   t.equal(mol.answer, 42, 'should get 42 for meaning of life')
   await hotImport(MODULE_RELATIVE_PATH, false)
 })

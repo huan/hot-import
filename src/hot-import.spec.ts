@@ -56,17 +56,15 @@ test('newCall()', async t => {
 })
 
 test('hotImport()', async t => {
-  t.test('class module', async t => {
+  t.test('class module(export=)', async t => {
     let file, cls
     for (const info of changingClassModuleFixtures()) {
       /**
-       * io wait for fs.watch
-       * the first one is enough for Linux(Ubuntu 17.04)
-       * the second one is needed for Windows 7
+       * io event loop wait for fs.watch
        * FIXME: Find out the reason...
        */
-      await new Promise(setImmediate)
-      await new Promise(setImmediate)
+      await new Promise(setImmediate) // the first one is enough for Linux(Ubuntu 17.04)
+      await new Promise(setImmediate) // the second one is needed for Windows 7
 
       if (!cls) {
         file = info.file
@@ -83,16 +81,38 @@ test('hotImport()', async t => {
       await hotImport(file, false)
     }
   })
+
+  t.test('variable module(export const answer=)', async t => {
+    let file, hotMod
+    for (const info of changingVariableModuleFixtures()) {
+      /**
+       * io event loop wait for fs.watch
+       * FIXME: Find out the reason...
+       */
+      await new Promise(setImmediate) // the first one is enough for Linux(Ubuntu 17.04)
+      await new Promise(setImmediate) // the second one is needed for Windows 7
+
+      if (!hotMod) {
+        file = info.file
+        hotMod = await hotImport(file)
+      } else {
+        t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
+      }
+
+      t.equal(hotMod.answer, info.returnValue, 'should get expected values from variable in module')
+    }
+    if (file) {
+      await hotImport(file, false)
+    }
+  })
 })
 
 test('importFile()', async t => {
   t.test('const value', async t => {
     for (const info of changingVariableModuleFixtures()) {
-      // console.log('info', info)
-      // const file = info.file.replace(/\.ts$/i, '')
-      const m = await importFile(info.file)
-      t.equal(m, info.returnValue, 'should import file right with returned value ' + info.returnValue)
-      purgeRequireCache(info.file)
+      const hotMod = await importFile(info.file)
+      t.equal(hotMod.answer, info.returnValue, 'should import file right with returned value ' + info.returnValue)
+      break // only test once for importFile
     }
   })
   t.test('class', async t => {
@@ -101,7 +121,7 @@ test('importFile()', async t => {
       const result = new m(EXPECTED_TEXT)
       t.equal(result.text, EXPECTED_TEXT, 'should instanciated class with constructor argument')
       t.equal(result.id, info.returnValue, 'should import module class with right id')
-      purgeRequireCache(info.file)
+      break // only test once for importFile
     }
   })
 })
