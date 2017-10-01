@@ -1,3 +1,4 @@
+#!/usr/bin/env ts-node
 import * as path  from 'path'
 
 // tslint:disable:no-shadowed-variable
@@ -26,8 +27,8 @@ import {
   // restoreRequireCache,
 }                           from './hot-import'
 
-// import { log }      from 'brolog'
-// log.level('silly')
+import { log }      from 'brolog'
+log.level('silly')
 
 const EXPECTED_TEXT = 'testing123'
 
@@ -55,7 +56,7 @@ test('newCall()', async t => {
   t.equal(textClass.text, EXPECTED_TEXT, 'should instanciate class with constructor arguments')
 })
 
-test('hotImport()', async t => {
+test.only('hotImport()', async t => {
   t.test('class module(export=)', async t => {
     let file, cls
     for (const info of changingClassModuleFixtures()) {
@@ -82,29 +83,29 @@ test('hotImport()', async t => {
     }
   })
 
-  t.test('variable module(export const answer=)', async t => {
-    let file, hotMod
-    for (const info of changingVariableModuleFixtures()) {
-      /**
-       * io event loop wait for fs.watch
-       * FIXME: Find out the reason...
-       */
-      await new Promise(setImmediate) // the first one is enough for Linux(Ubuntu 17.04)
-      await new Promise(setImmediate) // the second one is needed for Windows 7
+  // t.test('variable module(export const answer=)', async t => {
+  //   let file, hotMod
+  //   for (const info of changingVariableModuleFixtures()) {
+  //     /**
+  //      * io event loop wait for fs.watch
+  //      * FIXME: Find out the reason...
+  //      */
+  //     await new Promise(setImmediate) // the first one is enough for Linux(Ubuntu 17.04)
+  //     await new Promise(setImmediate) // the second one is needed for Windows 7
 
-      if (!hotMod) {
-        file = info.file
-        hotMod = await hotImport(file)
-      } else {
-        t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
-      }
+  //     if (!hotMod) {
+  //       file = info.file
+  //       hotMod = await hotImport(file)
+  //     } else {
+  //       t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
+  //     }
 
-      t.equal(hotMod.answer, info.returnValue, 'should get expected values from variable in module')
-    }
-    if (file) {
-      await hotImport(file, false)
-    }
-  })
+  //     t.equal(hotMod.answer, info.returnValue, 'should get expected values from variable in module')
+  //   }
+  //   if (file) {
+  //     await hotImport(file, false)
+  //   }
+  // })
 })
 
 test('importFile()', async t => {
