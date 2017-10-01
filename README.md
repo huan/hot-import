@@ -103,6 +103,9 @@ The only API in this module is `hotImport()`, it will import the module and relo
 const hotMod = await hotImport('./mod')
 
 // ... do staffs
+// hotMod.method()
+// const c = new hotMod.cls()
+// const c = new hotMod()
 
 // make module cold, not to watch/reload anymore.
 await hotImport('./mod', false)
