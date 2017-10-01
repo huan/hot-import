@@ -195,16 +195,26 @@ export function initProxyModule(absFilePath: string): any {
   }
 
   const proxyModule = function (this: any, ...args: any[]): any {
-    if (new.target) { // https://stackoverflow.com/a/31060154/1123955
-      // for `new HotMod()`
-      return newCall(moduleStore[absFilePath], ...args)
-    } else {
-      // for just `hotMethod()`
-      if (typeof moduleStore[absFilePath] !== 'function') {
-        throw new TypeError('is not a function')
-      }
-      return moduleStore[absFilePath].apply(this, args)
+    log.verbose('HotImport', 'initProxyModule() proxyModule()')
+
+    let realModule = moduleStore[absFilePath]
+
+    // use default by default.
+    // `hotMod = hotImport(...) v.s. import hotMod from '...'
+    if (typeof realModule.default === 'function') {
+      log.verbose('HotImport', 'initProxyModule() proxyModule() using default export')
+      realModule = realModule.default
     }
+
+    if (typeof realModule !== 'function') {
+      throw new TypeError('is not a function')
+    }
+    // https://stackoverflow.com/a/31060154/1123955
+    if (new.target) { // called with constructor: `new HotMod()`
+      return newCall(realModule, ...args)
+    }
+    // called without constructor: `hotMethod()`
+    return realModule.apply(this, args)
   }
   return proxyModule
 }

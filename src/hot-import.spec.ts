@@ -144,6 +144,15 @@ test('hotImport()', async t => {
       await hotImport(file, false)
     }
   })
+
+  t.test('module that only has a default export', async t => {
+    const EXPECTED_RETURN_VALUE = 42
+    const DEFAULT_EXPORT_ONLY_MODULE_FILE = '../tests/fixtures/default-export-module'
+    const mod = await hotImport(DEFAULT_EXPORT_ONLY_MODULE_FILE)
+    t.equal(mod(), EXPECTED_RETURN_VALUE, 'should get the default export function return value right')
+    hotImport(DEFAULT_EXPORT_ONLY_MODULE_FILE, false)
+  })
+
 })
 
 test('importFile()', async t => {
