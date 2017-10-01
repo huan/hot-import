@@ -9,10 +9,11 @@
     "test": "tests"
   },
   "scripts": {
+    "check-node-version": "check-node-version --node \">= 7\"",
     "clean": "shx rm -fr dist/*",
     "demo": "ts-node examples/demo",
     "dist": "npm run clean && tsc",
-    "lint": "tslint --version && tslint --project tsconfig.json \"{src,tests}/**/*.ts\" --exclude \"tests/fixtures/**\" --exclude \"dist/\" && npm run clean && tsc --noEmit",
+    "lint": "npm run check-node-version && tslint --version && tslint --project tsconfig.json \"{src,tests}/**/*.ts\" --exclude \"tests/fixtures/**\" --exclude \"dist/\" && npm run clean && tsc --noEmit",
     "test": "npm run lint && npm run test:unit",
     "test:npm": "npm run dist && cross-env-shell TMPDIR=/tmp/npm-package-test.$$ 'npm pack && mkdir $TMPDIR && mv *-*.*.*.tgz $TMPDIR && cp tests/fixtures/smoke-testing.js $TMPDIR && cd $TMPDIR && npm init -y && npm i *-*.*.*.tgz && node smoke-testing.js'",
     "test:unit": "blue-tape -r ts-node/register \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\""
@@ -42,6 +43,7 @@
     "@types/node": "^8.0.31",
     "@types/rimraf": "^2.0.2",
     "blue-tape": "^1.0.0",
+    "check-node-version": "^2.1.0",
     "cross-env": "^5.0.5",
     "rimraf": "^2.6.2",
     "shx": "^0.2.2",
@@ -57,5 +59,8 @@
     "LICENSE",
     "package.json",
     "README.md"
-  ]
+  ],
+  "engines": {
+    "node": ">= 7"
+  }
 }
