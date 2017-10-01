@@ -24,7 +24,7 @@ export async function refreshImport(absFilePath: string): Promise<void> {
       moduleStore[absFilePath],
     )
 
-    log.verbose('HotImport', 'refreshImport(%s) Hot Module Re-Imported', absFilePath)
+    log.verbose('HotImport', 'refreshImport(%s) Hot Module Replacement (HMR): Re-Imported', absFilePath)
   } catch (e) {
     log.error('HotImport', 'refreshImport(%s) exception: %s', absFilePath, e)
     restoreRequireCache(absFilePath, oldCache)
@@ -32,14 +32,18 @@ export async function refreshImport(absFilePath: string): Promise<void> {
   }
 }
 
-export async function hotImport(filePathRelativeToCaller: string)               : Promise<any>
-export async function hotImport(filePathRelativeToCaller: string, watch: false) : Promise<void>
+export async function hotImport(filePathRelativeToCaller: string)                      : Promise<any>
+export async function hotImport(filePathRelativeToCaller: string | null, watch: false) : Promise<void>
 
-export async function hotImport(filePathRelativeToCaller: string, watch = true): Promise<any> {
+export async function hotImport(filePathRelativeToCaller: string | null, watch = true): Promise<any> {
   log.verbose('HotImport', 'hotImport(%s, %s)', filePathRelativeToCaller, watch)
 
-  if (!watch) {
-    makeCold(filePathRelativeToCaller)
+  if (!filePathRelativeToCaller || !watch) {
+    if (filePathRelativeToCaller) {
+      makeCold(filePathRelativeToCaller)
+    } else {
+      makeColdAll()
+    }
     return
   }
 
