@@ -60,6 +60,7 @@ test('hotImport()', async t => {
     let file, cls
     for (const info of changingClassModuleFixtures()) {
       await new Promise(setImmediate) // io wait for fs.watch
+      await new Promise(resolve => setTimeout(resolve, 100))
 
       if (!cls) {
         file = info.file
