@@ -23,12 +23,22 @@ USAGE
 
 Talk is cheap, show me the code!
 
+### Core Code
+
+```ts
+import hotImport from 'hot-import'
+const hotMod = await hotImport(MODULE_FILE)
+hotMod.method()
+```
+
+### Full Example
+
 ```ts
 import * as assert  from 'assert'
 import * as fs      from 'fs'
 import * as path    from 'path'
 
-import hotImport  from '../'
+import hotImport  from 'hot-import'
 
 async function main() {
   const MODULE_CODE_42 = 'exports.answer = () => 42'
@@ -37,16 +47,16 @@ async function main() {
   const MODULE_FILE = path.join(__dirname, 't.js')
 
   fs.writeFileSync(MODULE_FILE, MODULE_CODE_42)
-  const mod = await hotImport(MODULE_FILE)
+  const hotMod = await hotImport(MODULE_FILE)
 
-  const fourtyTwo = mod.answer()
+  const fourtyTwo = hotMod.answer()
   console.log('fourtyTwo = ', fourtyTwo)  // Output: fourtyTwo = 42
   assert(fourtyTwo === 42, 'first get 42')
 
   fs.writeFileSync(MODULE_FILE, MODULE_CODE_17)
   await new Promise(setImmediate) // wait io event loop finish
 
-  const sevenTeen = mod.answer()
+  const sevenTeen = hotMod.answer()
   console.log('sevenTeen = ', sevenTeen)  // Output sevenTeen = 17
   assert(sevenTeen === 17, 'get 17 after file update & hot reloaded')
 
@@ -200,7 +210,7 @@ SEE ALSO
 AUTHOR
 ------
 
-Huan LI zixia@zixia.net http://linkedin.com/in/zixia
+Huan LI \<zixia\@zixia.net\> \(http://linkedin.com/in/zixia\)
 
 <a href="http://stackoverflow.com/users/1123955/zixia">
   <img src="http://stackoverflow.com/users/flair/1123955.png" width="208" height="58" alt="profile for zixia at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for zixia at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
@@ -209,6 +219,6 @@ Huan LI zixia@zixia.net http://linkedin.com/in/zixia
 COPYRIGHT & LICENSE
 -------------------
 
-* Code & Docs © 2017 Huan LI \<zixia@zixia.net\>
+* Code & Docs © 2017 Huan LI \<zixia\@zixia.net\>
 * Code released under the Apache-2.0 License
 * Docs released under Creative Commons

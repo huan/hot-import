@@ -86,7 +86,7 @@ test('1/4. fs.writeFileSync then fs.writeFile', async t => {
     await write(file, Math.random())
 
   }
-  await new Promise(r => setTimeout(r, 10))
+  await new Promise(r => setTimeout(r, 100))
 
   t.ok(changeCounter >= 1, 'should monitored file change event at least once')
   t.ok(changeCounter <= 2, 'should monitored file change event at most twice')
