@@ -73,6 +73,27 @@ $ npm install
 $ npm run demo
 ```
 
+API
+---
+
+There's only one API in this module.
+
+### `hotImport(filePath: string, hot = true): Promise<any>`
+
+```ts
+// load './mod' as a hot module
+const mod = await hotImport('./mod')
+
+// ... do staffs
+
+// make module cold, not watch/reload anymore.
+await hotImport('./mod', false)
+```
+
+**Attention**: 
+1. Do `const mod = await hotImport()`; Do NOT `const { mod } = await hotImport()`
+1. Do `mod.method()` to call a hot module; Do NOT `const method = mod.method; method()`
+
 SEE ALSO
 --------
 1. [Support hot-reload for Wechaty events listeners](https://github.com/Chatie/wechaty/issues/820)
