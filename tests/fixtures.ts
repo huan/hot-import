@@ -1,3 +1,6 @@
+// https://github.com/Microsoft/TypeScript/issues/14151#issuecomment-280812617
+(<any>Symbol).asyncIterator = Symbol.asyncIterator || Symbol.for('Symbol.asyncIterator')
+
 import * as fs    from 'fs'
 import * as os    from 'os'
 import * as path  from 'path'
@@ -9,9 +12,7 @@ export interface ModuleInfo {
   returnValue : any,
 }
 
-// Actually the `export = 42` is not supported by hot-import currently.
-// This fixture is only for test purpose.
-export function* changingVariableModuleFixtures(): IterableIterator<ModuleInfo> {
+export async function* changingVariableModuleFixtures(): AsyncIterableIterator<ModuleInfo> {
   for (const workDir of tmpDir()) {
     const MODULE_FILE = path.join(
       workDir,
@@ -28,7 +29,13 @@ export function* changingVariableModuleFixtures(): IterableIterator<ModuleInfo> 
         returnValue : EXPECTED_ORIGINAL_TEXT,
       }
 
-      fs.writeFileSync(MODULE_FILE, `export const answer = '${EXPECTED_CHANGED_TEXT}'`)
+      await new Promise(resolve => {
+        fs.writeFile(
+          MODULE_FILE,
+          `export const answer = '${EXPECTED_CHANGED_TEXT}'`,
+          resolve,
+        )
+      })
 
       yield {
         file        : MODULE_FILE,
@@ -63,7 +70,7 @@ export function* emptyObjectModuleFixture(): IterableIterator<ModuleInfo> {
   }
 }
 
-export function* changingClassModuleFixtures(): IterableIterator<ModuleInfo> {
+export async function* changingClassModuleFixtures(): AsyncIterableIterator<ModuleInfo> {
   for (const workDir of tmpDir()) {
     const moduleFile = path.join(
       workDir,
@@ -80,7 +87,7 @@ export function* changingClassModuleFixtures(): IterableIterator<ModuleInfo> {
         returnValue : 1,
       }
 
-      fs.writeFileSync(moduleFile, moduleCode2)
+      await new Promise(resolve => fs.writeFile(moduleFile, moduleCode2, resolve))
 
       yield {
         file        : moduleFile,
@@ -93,7 +100,7 @@ export function* changingClassModuleFixtures(): IterableIterator<ModuleInfo> {
   }
 }
 
-function* tmpDir(): IterableIterator<string> {
+export function* tmpDir(): IterableIterator<string> {
   const dir = fs.mkdtempSync(
     path.join(
       os.tmpdir(),
