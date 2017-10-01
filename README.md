@@ -218,6 +218,15 @@ SEE ALSO
 1. [给微信机器人添加热重启功能](http://blog.chatie.io/developer/2017/03/20/added-hot-reload-for-bots.html)
 1. [make js file hot-reload when use hot-require to load the file](https://github.com/rayosu/hot-require)
 
+CHANGELOG
+---------
+
+### v0.1 Oct, 2017
+
+1. Passed all the unit tests under Windows/Linux/Mac
+1. Support TypeScript typings
+1. Initial release
+
 AUTHOR
 ------
 
