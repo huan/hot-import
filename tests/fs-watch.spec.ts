@@ -89,7 +89,7 @@ test('1/4. fs.writeFileSync then fs.writeFile', async t => {
   await new Promise(r => setTimeout(r, 100))
 
   t.ok(changeCounter >= 1, 'should monitored file change event at least once')
-  t.ok(changeCounter <= 2, 'should monitored file change event at most twice')
+  // t.ok(changeCounter <= 2, 'should monitored file change event at most twice')
   t.ok(watcher, 'should instanciated a watcher')
   if (watcher) {
     watcher.close()
@@ -218,7 +218,7 @@ test('fixtures', async t => {
   }
   await new Promise(r => setTimeout(r, 10))
   t.ok(changeCounter >= 1, 'should monitored file change event at least once')
-  t.ok(changeCounter <= 2, 'should monitored file change event at most twice')
+  // t.ok(changeCounter <= 2, 'should monitored file change event at most twice')
   t.equal(renameCounter, 0, 'should not monitored file rename event')
   t.ok(watcher, 'should instanciated a watcher')
   if (watcher) {

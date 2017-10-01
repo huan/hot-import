@@ -9,7 +9,15 @@ Hot Module Replacement(HMR) for Node.js
 
 ![Hot Module Reload](https://zixia.github.io/hot-import/images/reload.png)
 
-_Hot Module Replacement_ (HMR) is a feature to inject updated modules into the active runtime. It's like LiveReload for every module. `hot-import` is a NPM module that enable you to do HMR with just one line of code.
+_Hot Module Replacement_ (HMR) is a feature to inject updated modules into the active runtime. It's like LiveReload for every module. 
+
+> HMR exchanges, adds, or removes modules while an application is running, without a full reload. This can significantly speed up development in a few ways:
+> * Retain application state which is lost during a full reload.
+> * Save valuable development time by only updating what's changed.
+>
+> -- WebPack Concepts - <https://webpack.js.org/concepts/hot-module-replacement/>
+
+`hot-import` is a NPM module that enable you to do HMR with just one line of code.
 
 INSTALL
 -------
