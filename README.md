@@ -94,6 +94,103 @@ await hotImport('./mod', false)
 1. Do `const hotMod = await hotImport()`; Do NOT `const { mod } = await hotImport()`
 1. Do `hotMod.method()` to call a method inside hot module; Do NOT `const method = hotMod.method; method()`
 
+TEST
+----
+
+This module is fully tested under Linux/Mac/Windows.
+
+```shell
+$ npm test
+
+> hot-import@0.0.24 test /home/zixia/git/hot-import
+> npm run lint && npm run test:unit
+
+
+> hot-import@0.0.24 lint /home/zixia/git/hot-import
+> npm run check-node-version && tslint --version && tslint --project tsconfig.json "{src,tests}/**/*.ts" --exclude "tests/fixtures/**" --exclude "dist/" && npm run clean && tsc --noEmit
+
+
+> hot-import@0.0.24 check-node-version /home/zixia/git/hot-import
+> check-node-version --node ">= 7"
+
+node: 8.5.0
+npm: 5.3.0
+yarn: not installed
+5.7.0
+
+> hot-import@0.0.24 clean /home/zixia/git/hot-import
+> shx rm -fr dist/*
+
+
+> hot-import@0.0.24 test:unit /home/zixia/git/hot-import
+> blue-tape -r ts-node/register -r source-map-support/register "src/**/*.spec.ts" "tests/**/*.spec.ts"
+
+TAP version 13
+# callerResolve()
+# relative file path
+ok 1 should turn relative to absolute
+# absolute file path
+ok 2 should keep absolute as it is
+# newCall()
+ok 3 should instanciate class with constructor arguments
+# hotImport()
+# class module(export=)
+ok 4 should get expected values from instance of class in module
+ok 5 should import module class with right id:1
+ok 6 should get same module file for fixtures(change file content only)
+ok 7 should get expected values from instance of class in module
+ok 8 should import module class with right id:2
+# variable module(export const answer=)
+ok 9 should get expected values from variable in module
+ok 10 should get same module file for fixtures(change file content only)
+ok 11 should get expected values from variable in module
+# importFile()
+# const value
+ok 12 should import file right with returned value original
+# class
+ok 13 should instanciated class with constructor argument
+ok 14 should import module class with right id
+# refreshImport()
+ok 15 should be refreshed to new value
+# purgeRequireCache()
+ok 16 should get returnValue from module
+ok 17 should keep value in require cache
+ok 18 should get returnValue again after purge
+ok 19 should no KEY exists any more
+# cloneProperties()
+# object
+ok 20 should clone the text property
+# class
+ok 21 should clone the prototype for class
+# hotImport
+ok 22 should get 42 for meaning of life
+# callerResolve
+ok 23 should resolve based on the consumer file path
+# 1/4. fs.writeFileSync then fs.writeFile
+ok 24 should monitored file change event at least once
+ok 25 should monitored file change event at most twice
+ok 26 should instanciated a watcher
+# 2/4. fs.writeFileSync then fs.writeFileSync
+ok 27 should instanciated a watcher
+# 3/4. fs.writeFile then fs.writeFile
+ok 28 should monitored 1 change event
+ok 29 should monitored 0 rename event
+ok 30 should instanciated a watcher
+# 4/4. fs.writeFile then fs.writeFileSync
+ok 31 should instanciated a watcher
+# fixtures
+ok 32 should monitored file change event at least once
+ok 33 should monitored file change event at most twice
+ok 34 should not monitored file rename event
+ok 35 should instanciated a watcher
+
+1..35
+# tests 35
+# pass  35
+
+# ok
+```
+
 SEE ALSO
 --------
 1. [Support hot-reload for Wechaty events listeners](https://github.com/Chatie/wechaty/issues/820)
