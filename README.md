@@ -40,15 +40,15 @@ async function main() {
   const mod = await hotImport(MODULE_FILE)
 
   const fourtyTwo = mod.answer()
+  console.log('fourtyTwo = ', fourtyTwo)  // Output: fourtyTwo = 42
   assert(fourtyTwo === 42, 'first get 42')
-  console.log(fourtyTwo)  // Output: 42
 
   fs.writeFileSync(MODULE_FILE, MODULE_CODE_17)
   await new Promise(setImmediate) // wait io event loop finish
 
   const sevenTeen = mod.answer()
+  console.log('sevenTeen = ', sevenTeen)  // Output sevenTeen = 17
   assert(sevenTeen === 17, 'get 17 after file update & hot reloaded')
-  console.log(sevenTeen)  // Output 17
 
   await hotImport(MODULE_FILE, false) // stop hot watch
 }
