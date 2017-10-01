@@ -12,6 +12,28 @@ export interface ModuleInfo {
   returnValue : any,
 }
 
+export function* emptyObjectModuleFixture(): IterableIterator<ModuleInfo> {
+  for (const workDir of tmpDir()) {
+    const moduleFile = path.join(
+      workDir,
+      'empty-module.ts',
+    )
+    const expectedValue = {}
+
+    try {
+      fs.writeFileSync(moduleFile, `export = {}`)
+
+      yield {
+        file        : moduleFile,
+        returnValue : expectedValue,
+      }
+
+    } catch (e) {
+      console.error(e)
+    }
+  }
+}
+
 export async function* changingVariableModuleFixtures(): AsyncIterableIterator<ModuleInfo> {
   for (const workDir of tmpDir()) {
     const MODULE_FILE = path.join(
@@ -48,28 +70,6 @@ export async function* changingVariableModuleFixtures(): AsyncIterableIterator<M
   }
 }
 
-export function* emptyObjectModuleFixture(): IterableIterator<ModuleInfo> {
-  for (const workDir of tmpDir()) {
-    const moduleFile = path.join(
-      workDir,
-      'empty-module.ts',
-    )
-    const expectedValue = {}
-
-    try {
-      fs.writeFileSync(moduleFile, `export = {}`)
-
-      yield {
-        file        : moduleFile,
-        returnValue : expectedValue,
-      }
-
-    } catch (e) {
-      console.error(e)
-    }
-  }
-}
-
 export async function* changingClassModuleFixtures(): AsyncIterableIterator<ModuleInfo> {
   for (const workDir of tmpDir()) {
     const moduleFile = path.join(
@@ -92,6 +92,42 @@ export async function* changingClassModuleFixtures(): AsyncIterableIterator<Modu
       yield {
         file        : moduleFile,
         returnValue : 2,
+      }
+
+    } catch (e) {
+      console.error(e)
+    }
+  }
+}
+
+export async function* changingRawFuncModuleFixtures(): AsyncIterableIterator<ModuleInfo> {
+  for (const workDir of tmpDir()) {
+    const MODULE_FILE = path.join(
+      workDir,
+      'changing-module.ts',
+    )
+    const ORIGINAL_TEXT = 'original'
+    const CHANGED_TEXT  = 'changed'
+
+    try {
+      fs.writeFileSync(MODULE_FILE, `export = () => '${ORIGINAL_TEXT}'`)
+
+      yield {
+        file        : MODULE_FILE,
+        returnValue : ORIGINAL_TEXT,
+      }
+
+      await new Promise(resolve => {
+        fs.writeFile(
+          MODULE_FILE,
+          `export = () => '${CHANGED_TEXT}'`,
+          resolve,
+        )
+      })
+
+      yield {
+        file        : MODULE_FILE,
+        returnValue : CHANGED_TEXT,
       }
 
     } catch (e) {

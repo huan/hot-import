@@ -5,8 +5,9 @@ import * as path  from 'path'
 import * as test  from 'blue-tape'
 
 import {
-  changingVariableModuleFixtures,
   changingClassModuleFixtures,
+  changingRawFuncModuleFixtures,
+  changingVariableModuleFixtures,
   emptyObjectModuleFixture,
 }                           from '../tests/fixtures'
 
@@ -108,6 +109,31 @@ test('hotImport()', async t => {
 
       await new Promise(resolve => setTimeout(resolve, 10))
       t.equal(hotMod.answer, info.returnValue, 'should get expected values from variable in module')
+    }
+    if (file) {
+      await hotImport(file, false)
+    }
+  })
+
+  t.test('raw export module(export = () => "value")', async t => {
+    let file, hotMod
+    for await (const info of changingRawFuncModuleFixtures()) {
+      /**
+       * io event loop wait for fs.watch
+       * FIXME: Find out the reason...
+       */
+      await new Promise(setImmediate) // the first one is enough for Linux(Ubuntu 17.04) with Node.js v8
+      await new Promise(setImmediate) // the second one is needed for Windows 7
+
+      if (!hotMod) {
+        file = info.file
+        hotMod = await hotImport(file)
+      } else {
+        t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 10))
+      t.equal(hotMod(), info.returnValue, 'should get expected values from the return value of raw func in module')
     }
     if (file) {
       await hotImport(file, false)
