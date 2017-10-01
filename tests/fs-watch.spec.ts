@@ -45,18 +45,20 @@ async function watch(
   return watcher
 
   function onChange(eventType: 'rename' | 'change') {
-    if (eventType !== 'change') {
-      return
-    }
     let size
     try {
+      // the first change event is create a size 0 file
+      // however, when we stat the file, the file might already be writen some data.
+      // so we also might get a size>0 at here.
       size = fs.statSync(file).size
-      log.verbose('TestFsWatch', 'watch(%s) onChange() size:', file, size)
+      log.verbose('TestFsWatch', 'watch(%s) onChange(%s) size: %s',
+                                  file, eventType, size)
     } catch (e) {
-      log.verbose('TestFsWatch', 'watch(%s) onChange() fs.statSync() exception: %s', file, e)
+      log.verbose('TestFsWatch', 'watch(%s) onChange(%s) fs.statSync() exception: %s',
+                                  file, eventType, e)
       return
     }
-    if (!size) {
+    if (eventType !== 'change' || !size) {
       return
     }
     cbChange()
@@ -214,8 +216,8 @@ test('fixtures', async t => {
     }
   }
   await new Promise(setImmediate)
-
-  t.equal(changeCounter, 1, 'should monitored file change event')
+  await new Promise(r => setTimeout(r, 100))
+  t.ok(changeCounter >= 1, 'should monitored file change event at least once')
   t.equal(renameCounter, 0, 'should not monitored file rename event')
   t.ok(watcher, 'should instanciated a watcher')
   if (watcher) {
