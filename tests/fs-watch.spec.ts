@@ -30,24 +30,30 @@ async function write(file: string, data: string | number): Promise<void> {
 
 async function watch(
   file     : string,
-  cbRename : Function,
-  cbChange : Function,
+  cbChange : (...args: any[]) => void,
+  cbRename : (...args: any[]) => void,
 ): Promise<fs.FSWatcher> {
-  const watcher = fs.watch(file, onEvent)
+  const watcher = fs.watch(file)
+  .on('error', e => {
+    log.verbose('TestFsWatch', 'watch(%s) watcher.on(error): %s', file, e)
+  })
+  .on('change', onChange)
+  .on('rename', cbRename)
+
   // wait all io event loop to be cleared before return watcher
   await new Promise(setImmediate)
   return watcher
 
-  function onEvent(event: 'change' | 'rename'): void {
-    log.verbose('TestFsWatch', 'watch(%s) fs.watch() event: %s', file, event)
-    if (event === 'change') {
-      onEventChange()
-    } else if (event === 'rename') {
-      cbRename()
-    }
-  }
+  // function onEvent(event: 'change' | 'rename'): void {
+  //   log.verbose('TestFsWatch', 'watch(%s) fs.watch() event: %s', file, event)
+  //   if (event === 'change') {
+  //     onEventChange()
+  //   } else if (event === 'rename') {
+  //     cbRename()
+  //   }
+  // }
 
-  function onEventChange() {
+  function onChange() {
     let size
     try {
       size = fs.statSync(file).size
@@ -73,7 +79,11 @@ test('1/4. fs.writeFileSync then fs.writeFile', async t => {
     fs.writeFileSync(file, Math.random())
     await new Promise(setImmediate)
 
-    watcher = await watch(file, () => renameCounter++, () => changeCounter++)
+    watcher = await watch(
+      file,
+      () => changeCounter++,
+      () => renameCounter++,
+    )
 
     // change the file
     await write(file, Math.random())
@@ -100,14 +110,19 @@ test('2/4. fs.writeFileSync then fs.writeFileSync', async t => {
     fs.writeFileSync(file, Math.random())
     await new Promise(setImmediate)
 
-    watcher = await watch(file, () => renameCounter++, () => changeCounter++)
+    watcher = await watch(
+      file,
+      () => changeCounter++,
+      () => renameCounter++,
+    )
 
     // change the file
     fs.writeFileSync(file, Math.random())
   }
   await new Promise(resolve => setTimeout(resolve, 10))
 
-  t.equal(changeCounter, 1, 'should monitored 1 change event')
+  // change event is not consistant through Windows & Linux: Windows fire twice, Linux fire once.
+  // t.equal(changeCounter, 1, 'should monitored 1 change event')
 
   //  rename event is not consistant through Mac & Linux: Mac fire once, Linux fire twice.
   // t.equal(renameCounter, 1, 'should monitored 1 rename event')
@@ -130,7 +145,11 @@ test('3/4. fs.writeFile then fs.writeFile', async t => {
     await write(file, Math.random())
     await new Promise(setImmediate)
 
-    watcher = await watch(file, () => renameCounter++, () => changeCounter++)
+    watcher = await watch(
+      file,
+      () => changeCounter++,
+      () => renameCounter++,
+    )
 
     // change the file
     await write(file, Math.random())
@@ -158,7 +177,11 @@ test('4/4. fs.writeFile then fs.writeFileSync', async t => {
     await write(file, Math.random())
     await new Promise(setImmediate)
 
-    watcher = await watch(file, () => renameCounter++, () => changeCounter++)
+    watcher = await watch(
+      file,
+      () => changeCounter++,
+      () => renameCounter++,
+    )
 
     // change the file
     fs.writeFileSync(file, Math.random())
@@ -185,7 +208,11 @@ test('fixtures', async t => {
   for await (const info of changingVariableModuleFixtures()) {
     if (!file) {
       file = info.file
-      watcher = await watch(file, () => renameCounter++, () => changeCounter++)
+      watcher = await watch(
+        file,
+        () => changeCounter++,
+        () => renameCounter++,
+      )
     } else {
       break // break on the 2nd loop
     }
