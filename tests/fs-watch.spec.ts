@@ -216,7 +216,7 @@ test('fixtures', async t => {
       break // break on the 2nd loop
     }
   }
-  await new Promise(setImmediate)
+  await new Promise(r => setTimeout(r, 10))
   t.ok(changeCounter >= 1, 'should monitored file change event at least once')
   t.ok(changeCounter <= 2, 'should monitored file change event at most twice')
   t.equal(renameCounter, 0, 'should not monitored file rename event')
