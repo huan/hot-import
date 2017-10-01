@@ -3,7 +3,7 @@ HOT-IMPORT
 
 [![Powered by TypeScript](https://img.shields.io/badge/Powered%20By-TypeScript-blue.svg)](https://www.typescriptlang.org/) [![node](https://img.shields.io/node/v/hot-import.svg?maxAge=604800)](https://nodejs.org/)
 
-[![Build Status](https://travis-ci.org/zixia/hot-import.svg?branch=master)](https://travis-ci.org/zixia/hot-import) [![NPM Version](https://badge.fury.io/js/hot-import.svg)](https://badge.fury.io/js/hot-import) [![Downloads](http://img.shields.io/npm/dm/hot-import.svg?style=flat-square)](https://npmjs.org/package/hot-import)
+[![Build Status](https://travis-ci.org/zixia/hot-import.svg?branch=master)](https://travis-ci.org/zixia/hot-import) [![Windows Build status](https://img.shields.io/appveyor/ci/zixia/hot-import/master.svg?label=Windows)](https://ci.appveyor.com/project/zixia/hot-import) [![NPM Version](https://badge.fury.io/js/hot-import.svg)](https://badge.fury.io/js/hot-import) [![Downloads](http://img.shields.io/npm/dm/hot-import.svg?style=flat-square)](https://npmjs.org/package/hot-import)
 
 Hot Module Re-Import on Change in Node.js
 
@@ -76,23 +76,23 @@ $ npm run demo
 API
 ---
 
-There's only one API in this module.
+The only API in this module is `hotImport()`, it will import the module and reload it when it changes.
 
 ### `hotImport(filePath: string, hot = true): Promise<any>`
 
 ```ts
 // load './mod' as a hot module
-const mod = await hotImport('./mod')
+const hotMod = await hotImport('./mod')
 
 // ... do staffs
 
-// make module cold, not watch/reload anymore.
+// make module cold, not to watch/reload anymore.
 await hotImport('./mod', false)
 ```
 
 **Attention**: 
-1. Do `const mod = await hotImport()`; Do NOT `const { mod } = await hotImport()`
-1. Do `mod.method()` to call a hot module; Do NOT `const method = mod.method; method()`
+1. Do `const hotMod = await hotImport()`; Do NOT `const { mod } = await hotImport()`
+1. Do `hotMod.method()` to call a method inside hot module; Do NOT `const method = hotMod.method; method()`
 
 SEE ALSO
 --------
