@@ -5,22 +5,22 @@ const path   = require('path')
 const { hotImport } = require('hot-import')
 
 async function main() {
-  const MODULE_CODE_42 = 'exports.answer = () => 42'
-  const MODULE_CODE_17 = 'exports.answer = () => 17'
+  const MODULE_CODE_42 = 'module.exports = () => 42'
+  const MODULE_CODE_17 = 'module.exports.default = () => 17'
 
   const MODULE_FILE = path.join(__dirname, 't.js')
 
   try {
     fs.writeFileSync(MODULE_FILE, MODULE_CODE_42)
-    const mod = await hotImport(MODULE_FILE)
+    const hotMod = await hotImport(MODULE_FILE)
 
-    const fourtyTwo = mod.answer()
+    const fourtyTwo = hotMod()
     console.log(fourtyTwo)  // Output: fourtyTwo = 42
     assert(fourtyTwo === 42, 'first get 42')
 
     await new Promise(resolve => fs.writeFile(MODULE_FILE, MODULE_CODE_17, () => resolve()))
 
-    const sevenTeen = mod.answer()
+    const sevenTeen = hotMod()
     console.log(sevenTeen)  // Output sevenTeen = 17
     assert(sevenTeen === 17, 'get 17 after file update & hot reloaded')
 

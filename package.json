@@ -11,7 +11,9 @@
   "scripts": {
     "check-node-version": "check-node-version --node \">= 7\"",
     "clean": "shx rm -fr dist/*",
-    "demo": "ts-node examples/demo",
+    "demo": "npm run demo:ts",
+    "demo:ts": "ts-node examples/demo-ts",
+    "demo:js": "ts-node examples/demo-js",
     "dist": "npm run clean && tsc",
     "lint": "npm run check-node-version && tslint --version && tslint --project tsconfig.json \"{src,tests}/**/*.ts\" --exclude \"tests/fixtures/**\" --exclude \"dist/\" && npm run clean && tsc --noEmit",
     "test": "npm run lint && npm run test:unit",

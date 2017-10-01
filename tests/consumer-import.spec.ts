@@ -1,3 +1,4 @@
+#!/usr/bin/env ts-node
 import * as path  from 'path'
 
 // tslint:disable:no-shadowed-variable
