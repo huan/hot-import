@@ -59,8 +59,14 @@ test('hotImport()', async t => {
   t.test('class module', async t => {
     let file, cls
     for (const info of changingClassModuleFixtures()) {
-      await new Promise(setImmediate) // io wait for fs.watch
-      await new Promise(resolve => setTimeout(resolve, 100))
+      /**
+       * io wait for fs.watch
+       * the first one is enough for Linux(Ubuntu 17.04)
+       * the second one is needed for Windows 7
+       * FIXME: Find out the reason...
+       */
+      await new Promise(setImmediate)
+      await new Promise(setImmediate)
 
       if (!cls) {
         file = info.file
