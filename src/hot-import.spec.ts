@@ -50,7 +50,12 @@ test('callerResolve()', async t => {
   t.test('callerExceptFile', async t => {
     const filePath = callerResolve(RELATIVE_FILE_PATH, __filename)
     // console.log(filePath)
-    t.assert(filePath.endsWith('/node_modules/tape/lib/test'), 'except the current file name')
+    t.assert(filePath.endsWith(path.join( // cross platform: compatible with windows
+      'node_modules',
+      'tape',
+      'lib',
+      'test',
+    )), 'except the current file name')
   })
 })
 
