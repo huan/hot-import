@@ -71,26 +71,31 @@ export function makeHot(filePath: string): void {
   if (watcherStore[absFilePath]) {
     throw new Error(`makeHot(${absFilePath}) it's already hot!`)
   }
-  const watcher = fs.watch(absFilePath, event => {
-    if (event !== 'change') {
+  const watcher = fs.watch(absFilePath)
+  watcher.on('change', onChange)
+
+  watcherStore[absFilePath] = watcher
+
+  function onChange(eventType: 'rename' | 'change', filename: string) {
+    log.verbose('HotImport', 'makeHot(%s) onChange(%s, %s)', absFilePath, eventType, filename)
+    if (eventType !== 'change') {
       return
     }
+
     let size = 0
     try {
       size = fs.statSync(absFilePath).size
     } catch (e) {
-      log.verbose('HotImport', 'hotImport() fs.statSync(%s) exception: %s',
+      log.verbose('HotImport', 'makeHot() onChange() fs.statSync(%s) exception: %s',
                             absFilePath, e)
     }
     // change event might fire multiple times, one for create(with zero size), others for write.
     if (size === 0) {
-      log.verbose('HotImport', 'hotImport() fs.statSync(%s) size:0', absFilePath)
+      log.verbose('HotImport', 'makeHot() onChange() fs.statSync(%s) size:0', absFilePath)
       return
     }
-    log.verbose('HotImport', 'hotImport() fs.watch(%s, %s)', absFilePath, event)
     refreshImport(absFilePath)
-  })
-  watcherStore[absFilePath] = watcher
+  }
 }
 
 export function makeCold(filePath: string): void {
