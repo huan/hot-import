@@ -5,11 +5,11 @@ HOT-IMPORT
 
 [![Build Status](https://travis-ci.org/zixia/hot-import.svg?branch=master)](https://travis-ci.org/zixia/hot-import) [![Windows Build status](https://img.shields.io/appveyor/ci/zixia/hot-import/master.svg?label=Windows)](https://ci.appveyor.com/project/zixia/hot-import) [![NPM Version](https://badge.fury.io/js/hot-import.svg)](https://badge.fury.io/js/hot-import) [![Downloads](http://img.shields.io/npm/dm/hot-import.svg?style=flat-square)](https://npmjs.org/package/hot-import)
 
-Hot Module Re-Import on Change in Node.js
+Hot Module Replacement(HMR) for Node.js
 
 ![Hot Module Reload](https://zixia.github.io/hot-import/images/reload.png)
 
-Reload your module dynamically, automatically after file changes.
+_Hot Module Replacement_ (HMR) is a feature to inject updated modules into the active runtime. It's like LiveReload for every module. `hot-import` is a NPM module that enable you to do HMR with just one line of code.
 
 INSTALL
 -------
