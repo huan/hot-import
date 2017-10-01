@@ -44,7 +44,10 @@ async function watch(
   await new Promise(setImmediate)
   return watcher
 
-  function onChange() {
+  function onChange(eventType: 'rename' | 'change') {
+    if (eventType !== 'change') {
+      return
+    }
     let size
     try {
       size = fs.statSync(file).size
