@@ -18,8 +18,7 @@ async function main() {
     console.log(fourtyTwo)  // Output: fourtyTwo = 42
     assert(fourtyTwo === 42, 'first get 42')
 
-    fs.writeFileSync(MODULE_FILE, MODULE_CODE_17)
-    await new Promise(setImmediate) // wait io event loop finish
+    await new Promise(resolve => fs.writeFile(MODULE_FILE, MODULE_CODE_17, () => resolve()))
 
     const sevenTeen = mod.answer()
     console.log(sevenTeen)  // Output sevenTeen = 17

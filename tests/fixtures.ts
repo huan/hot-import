@@ -18,28 +18,28 @@ export async function* changingVariableModuleFixtures(): AsyncIterableIterator<M
       workDir,
       'changing-module.ts',
     )
-    const EXPECTED_ORIGINAL_TEXT = 'original'
-    const EXPECTED_CHANGED_TEXT  = 'changed'
+    const ORIGINAL_TEXT = 'original'
+    const CHANGED_TEXT  = 'changed'
 
     try {
-      fs.writeFileSync(MODULE_FILE, `export const answer = '${EXPECTED_ORIGINAL_TEXT}'`)
+      fs.writeFileSync(MODULE_FILE, `export const answer = '${ORIGINAL_TEXT}'`)
 
       yield {
         file        : MODULE_FILE,
-        returnValue : EXPECTED_ORIGINAL_TEXT,
+        returnValue : ORIGINAL_TEXT,
       }
 
       await new Promise(resolve => {
         fs.writeFile(
           MODULE_FILE,
-          `export const answer = '${EXPECTED_CHANGED_TEXT}'`,
+          `export const answer = '${CHANGED_TEXT}'`,
           resolve,
         )
       })
 
       yield {
         file        : MODULE_FILE,
-        returnValue : EXPECTED_CHANGED_TEXT,
+        returnValue : CHANGED_TEXT,
       }
 
     } catch (e) {
@@ -76,18 +76,18 @@ export async function* changingClassModuleFixtures(): AsyncIterableIterator<Modu
       workDir,
       'class-module.ts',
     )
-    const moduleCode1 = `export = class Test1 { public id = 1; constructor(public text: string) {}; }`
-    const moduleCode2 = `export = class Test2 { public id = 2; constructor(public text: string) {}; }`
+    const MODULE_CODE1 = `export = class Test1 { public id = 1; constructor(public text: string) {}; }`
+    const MODULE_CODE2 = `export = class Test2 { public id = 2; constructor(public text: string) {}; }`
 
     try {
-      fs.writeFileSync(moduleFile, moduleCode1)
+      fs.writeFileSync(moduleFile, MODULE_CODE1)
 
       yield {
         file        : moduleFile,
         returnValue : 1,
       }
 
-      await new Promise(resolve => fs.writeFile(moduleFile, moduleCode2, resolve))
+      await new Promise(resolve => fs.writeFile(moduleFile, MODULE_CODE2, resolve))
 
       yield {
         file        : moduleFile,

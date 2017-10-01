@@ -123,6 +123,7 @@ test('3/4. fs.writeFile then fs.writeFile', async t => {
 
     // change the file
     await write(file, Math.random())
+    await new Promise(setImmediate)
   }
   await new Promise(setImmediate)
 

@@ -1,9 +1,7 @@
 import * as fs      from 'fs'
 import * as path    from 'path'
 
-// const callerPath      = require('caller-path')
-const callsites       = require('callsites')
-
+import * as callsites from 'callsites'
 import { log }        from 'brolog'
 
 export interface KVStore {
@@ -51,13 +49,14 @@ export async function hotImport(filePathRelativeToCaller: string, watch = true):
   )
 
   if (!(absFilePath in moduleStore)) {
-    log.verbose('HotImport', 'hotImport() init moduleStore[%s]...', absFilePath)
     const newModule = await importFile(absFilePath)
     moduleStore[absFilePath] = newModule
     proxyStore[absFilePath]  = initProxyModule(absFilePath)
     cloneProperties(proxyStore[absFilePath], moduleStore[absFilePath])
 
     makeHot(absFilePath)
+  } else {
+    log.verbose('HotImport', 'hotImport() moduleStore[%s] already exist.', absFilePath)
   }
 
   return proxyStore[absFilePath]
@@ -80,11 +79,12 @@ export function makeHot(filePath: string): void {
     try {
       size = fs.statSync(absFilePath).size
     } catch (e) {
-      log.warn('HotImport', 'hotImport() fs.statSync(%s) exception: %s',
+      log.verbose('HotImport', 'hotImport() fs.statSync(%s) exception: %s',
                             absFilePath, e)
     }
+    // change event might fire multiple times, one for create(with zero size), others for write.
     if (size === 0) {
-      log.warn('HotImport', 'hotImport() fs.statSync(%s) size:0', absFilePath)
+      log.verbose('HotImport', 'hotImport() fs.statSync(%s) size:0', absFilePath)
       return
     }
     log.verbose('HotImport', 'hotImport() fs.watch(%s, %s)', absFilePath, event)

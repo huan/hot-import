@@ -27,8 +27,8 @@ import {
   // restoreRequireCache,
 }                           from './hot-import'
 
-import { log }      from 'brolog'
-log.level('silly')
+// import { log }      from 'brolog'
+// log.level('silly')
 
 const EXPECTED_TEXT = 'testing123'
 
@@ -56,10 +56,10 @@ test('newCall()', async t => {
   t.equal(textClass.text, EXPECTED_TEXT, 'should instanciate class with constructor arguments')
 })
 
-test.only('hotImport()', async t => {
+test('hotImport()', async t => {
   t.test('class module(export=)', async t => {
     let file, cls
-    for (const info of changingClassModuleFixtures()) {
+    for await (const info of changingClassModuleFixtures()) {
       /**
        * io event loop wait for fs.watch
        * FIXME: Find out the reason...
@@ -74,6 +74,7 @@ test.only('hotImport()', async t => {
         t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
       }
 
+      await new Promise(resolve => setTimeout(resolve, 10))
       const result = new cls(EXPECTED_TEXT)
       t.equal(result.text, EXPECTED_TEXT, 'should get expected values from instance of class in module')
       t.equal(result.id, info.returnValue, 'should import module class with right id:' + info.returnValue)
@@ -83,41 +84,42 @@ test.only('hotImport()', async t => {
     }
   })
 
-  // t.test('variable module(export const answer=)', async t => {
-  //   let file, hotMod
-  //   for (const info of changingVariableModuleFixtures()) {
-  //     /**
-  //      * io event loop wait for fs.watch
-  //      * FIXME: Find out the reason...
-  //      */
-  //     await new Promise(setImmediate) // the first one is enough for Linux(Ubuntu 17.04)
-  //     await new Promise(setImmediate) // the second one is needed for Windows 7
+  t.test('variable module(export const answer=)', async t => {
+    let file, hotMod
+    for await (const info of changingVariableModuleFixtures()) {
+      /**
+       * io event loop wait for fs.watch
+       * FIXME: Find out the reason...
+       */
+      await new Promise(setImmediate) // the first one is enough for Linux(Ubuntu 17.04) with Node.js v8
+      await new Promise(setImmediate) // the second one is needed for Windows 7
 
-  //     if (!hotMod) {
-  //       file = info.file
-  //       hotMod = await hotImport(file)
-  //     } else {
-  //       t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
-  //     }
+      if (!hotMod) {
+        file = info.file
+        hotMod = await hotImport(file)
+      } else {
+        t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
+      }
 
-  //     t.equal(hotMod.answer, info.returnValue, 'should get expected values from variable in module')
-  //   }
-  //   if (file) {
-  //     await hotImport(file, false)
-  //   }
-  // })
+      await new Promise(resolve => setTimeout(resolve, 10))
+      t.equal(hotMod.answer, info.returnValue, 'should get expected values from variable in module')
+    }
+    if (file) {
+      await hotImport(file, false)
+    }
+  })
 })
 
 test('importFile()', async t => {
   t.test('const value', async t => {
-    for (const info of changingVariableModuleFixtures()) {
+    for await (const info of changingVariableModuleFixtures()) {
       const hotMod = await importFile(info.file)
       t.equal(hotMod.answer, info.returnValue, 'should import file right with returned value ' + info.returnValue)
       break // only test once for importFile
     }
   })
   t.test('class', async t => {
-    for (const info of changingClassModuleFixtures()) {
+    for await (const info of changingClassModuleFixtures()) {
       const m = await importFile(info.file)
       const result = new m(EXPECTED_TEXT)
       t.equal(result.text, EXPECTED_TEXT, 'should instanciated class with constructor argument')
@@ -129,7 +131,7 @@ test('importFile()', async t => {
 
 test('refreshImport()', async t => {
   let cls
-  for (const info of changingClassModuleFixtures()) {
+  for await (const info of changingClassModuleFixtures()) {
     if (!cls) {
       cls = await importFile(info.file)
 
