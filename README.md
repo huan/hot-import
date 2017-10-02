@@ -94,16 +94,20 @@ API
 
 The only API in this module is `hotImport()`, it will import the module and reload it when it changes.
 
-### `hotImport(filePath: string, hot = true): Promise<any>`
+### 1. `hotImport(modulePath: string): Promise<any>`
+
+Import a module from `modulePath` as a Hot Module.
 
 ```ts
 // load './mod' as a hot module
 const hotMod = await hotImport('./mod')
 
-// ... do staffs
-// hotMod.method()
-// const c = new hotMod.cls()
-// const c = new hotMod()
+// ... do staffs like the following five ways
+// const c = hotMod()         // 1. default export is a Function
+// const c = new hotMod()     // 2. default export is a Class
+// const c = hotMod.func()    // 3. export is a { Function }
+// const c = new hotMod.cls() // 4. export is a { Class }
+// const c = hotMod.constant  // 5. export is a { const }
 
 // make module cold, not to watch/reload anymore.
 await hotImport('./mod', false)
@@ -112,6 +116,17 @@ await hotImport('./mod', false)
 **Attention**: 
 1. Do `const hotMod = await hotImport()`; Do NOT `const { mod } = await hotImport()`
 1. Do `hotMod.method()` to call a method inside hot module; Do NOT `const method = hotMod.method; method()`
+
+### 2. `hotImport(modulePath: string, watch: boolean): void`
+
+Turn the module from `modulePath` to be _hot_ or _cold_.
+
+1. If `watch` is `true`, then HMR will be enabled.
+1. If `watch` is `false`, then HMR will be disabled.
+
+### 3. `hotImport(null, watch: boolean): void`
+
+Turn all the modules that managed by 'hotImport` to be _hot_ or _cold_.
 
 TEST
 ----
