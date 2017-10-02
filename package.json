@@ -15,8 +15,9 @@
     "demo:ts": "ts-node examples/demo-ts",
     "demo:js": "ts-node examples/demo-js",
     "dist": "npm run clean && tsc",
-    "lint": "npm run check-node-version && tslint --version && tslint --project tsconfig.json \"{src,tests}/**/*.ts\" --exclude \"tests/fixtures/**\" --exclude \"dist/\" && npm run clean && tsc --noEmit",
-    "test": "npm run lint && npm run test:unit",
+    "lint": "tslint --version && tslint --project tsconfig.json \"{src,tests}/**/*.ts\" --exclude \"tests/fixtures/**\" --exclude \"dist/\" && npm run clean && tsc --noEmit",
+    "postinstall": "npm run check-node-version",
+    "test": "npm run lint && npm run check-node-version && npm run test:unit",
     "test:npm": "npm run dist && cross-env-shell TMPDIR=/tmp/npm-package-test.$$ 'npm pack && mkdir $TMPDIR && mv *-*.*.*.tgz $TMPDIR && cp tests/fixtures/smoke-testing.js $TMPDIR && cd $TMPDIR && npm init -y && npm i *-*.*.*.tgz && node smoke-testing.js'",
     "test:unit": "blue-tape -r ts-node/register -r source-map-support/register \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\""
   },
