@@ -33,8 +33,7 @@ Talk is cheap, show me the code!
 
 ```ts
 import hotImport from 'hot-import'
-const hotMod = await hotImport(MODULE_FILE)
-hotMod.method()
+const hotMod = await hotImport('./my-module')
 ```
 
 ### Full Example
