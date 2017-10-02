@@ -126,7 +126,7 @@ Turn the module from `modulePath` to be _hot_ or _cold_.
 
 ### 3. `hotImport(null, watch: boolean): Promise<void>`
 
-Turn all the modules that managed by 'hotImport` to be _hot_ or _cold_.
+Turn all the modules that managed by `hotImport` to be _hot_ or _cold_.
 
 TEST
 ----
