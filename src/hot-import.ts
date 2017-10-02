@@ -32,15 +32,15 @@ export async function refreshImport(absFilePath: string): Promise<void> {
   }
 }
 
-export async function hotImport(filePathRelativeToCaller: string)                      : Promise<any>
-export async function hotImport(filePathRelativeToCaller: string | null, watch: false) : Promise<void>
+export async function hotImport(modulePathRelativeToCaller: string)                        : Promise<any>
+export async function hotImport(modulePathRelativeToCaller: string | null, watch: boolean) : Promise<void>
 
-export async function hotImport(filePathRelativeToCaller: string | null, watch = true): Promise<any> {
-  log.verbose('HotImport', 'hotImport(%s, %s)', filePathRelativeToCaller, watch)
+export async function hotImport(modulePathRelativeToCaller: string | null, watch = true): Promise<any> {
+  log.verbose('HotImport', 'hotImport(%s, %s)', modulePathRelativeToCaller, watch)
 
-  if (!filePathRelativeToCaller || !watch) {
-    if (filePathRelativeToCaller) {
-      makeCold(filePathRelativeToCaller)
+  if (!modulePathRelativeToCaller) {
+    if (watch) {
+      makeHotAll()
     } else {
       makeColdAll()
     }
@@ -49,32 +49,39 @@ export async function hotImport(filePathRelativeToCaller: string | null, watch =
 
   // convert './module' to '${cwd}/module.js'
   const absFilePath = require.resolve(
-    callerResolve(filePathRelativeToCaller),
+    callerResolve(modulePathRelativeToCaller),
   )
 
-  if (!(absFilePath in moduleStore)) {
-    const newModule = await importFile(absFilePath)
-    moduleStore[absFilePath] = newModule
-    proxyStore[absFilePath]  = initProxyModule(absFilePath)
-    cloneProperties(proxyStore[absFilePath], moduleStore[absFilePath])
-
-    makeHot(absFilePath)
-  } else {
-    log.verbose('HotImport', 'hotImport() moduleStore[%s] already exist.', absFilePath)
+  if (!watch) {
+    makeCold(absFilePath)
+    return
   }
+
+  if (absFilePath in moduleStore) {
+    log.verbose('HotImport', 'hotImport() moduleStore[%s] already exist.', absFilePath)
+    return
+  }
+
+  const realModule = await importFile(absFilePath)
+
+  moduleStore[absFilePath] = realModule
+  proxyStore [absFilePath] = initProxyModule(absFilePath)
+
+  cloneProperties(proxyStore[absFilePath], moduleStore[absFilePath])
+
+  makeHot(absFilePath)
 
   return proxyStore[absFilePath]
 }
 
-export function makeHot(filePath: string): void {
-  const absFilePath = require.resolve(
-    callerResolve(filePath),
-  )
+export function makeHot(absFilePath: string): void {
   log.verbose('HotImport', 'makeHot(%s)', absFilePath)
 
   if (watcherStore[absFilePath]) {
-    throw new Error(`makeHot(${absFilePath}) it's already hot!`)
+    log.verbose('HotImport', `makeHot(${absFilePath}) it's already hot, skip it`)
+    return
   }
+
   const watcher = fs.watch(absFilePath)
   watcher.on('change', onChange)
 
@@ -102,11 +109,18 @@ export function makeHot(filePath: string): void {
   }
 }
 
-export function makeCold(filePath: string): void {
-  const absFilePath = require.resolve(
-    callerResolve(filePath),
-  )
-  log.verbose('HotImport', 'makeCold(%s)', absFilePath)
+export function makeCold(absFilePath: string) : void
+export function makeCold(mod: any)            : void
+
+export function makeCold(absFilePathOrMod: string | any): void {
+  log.verbose('HotImport', 'makeCold(%s)', absFilePathOrMod)
+
+  let absFilePath: string
+  if (typeof absFilePathOrMod === 'string') { // filePath
+    absFilePath = absFilePathOrMod
+  } else {                                    // module
+    absFilePath = mod2file(absFilePathOrMod)
+  }
 
   const watcher = watcherStore[absFilePath]
   if (watcher) {
@@ -115,15 +129,28 @@ export function makeCold(filePath: string): void {
   } else {
     log.verbose('HotImport', 'makeCold(%s) already cold.', absFilePath)
   }
+
+  return
+
+  function mod2file(mod: any) {
+    for (const file in proxyStore) {
+      if (proxyStore[file] === mod) {
+        return file
+      }
+    }
+    throw new Error('makeClold() mod2file() can not found module in proxyStore')
+  }
 }
 
 export function makeColdAll(): void {
   for (const file in watcherStore) {
-    const watcher = watcherStore[file]
-    if (watcher) {
-      watcher.close()
-      delete watcherStore[file]
-    }
+    makeCold(file)
+  }
+}
+
+export function makeHotAll(): void {
+  for (const file in watcherStore) {
+    makeHot(file)
   }
 }
 
