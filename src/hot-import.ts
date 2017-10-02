@@ -20,7 +20,7 @@ export async function refreshImport(absFilePath: string): Promise<void> {
     moduleStore[absFilePath]  = refreshedModule
 
     cloneProperties(
-      proxyStore[absFilePath],
+      proxyStore [absFilePath],
       moduleStore[absFilePath],
     )
 
@@ -231,6 +231,10 @@ export function initProxyModule(absFilePath: string): any {
     log.silly('HotImport', 'initProxyModule() proxyModule()')
 
     let realModule = moduleStore[absFilePath]
+    if (!realModule) {
+      log.error('HotImport', 'initProxyModule() proxyModule() moduleStore[%s] empty!', absFilePath)
+      throw new Error('Cannot get realModule from moduleStore for ' + absFilePath)
+    }
 
     // use default by default.
     // `hotMod = hotImport(...) v.s. import hotMod from '...'
@@ -260,9 +264,11 @@ export async function importFile(absFilePath: string): Promise<any> {
   }
 
   try {
-    return await import(absFilePath)
+    const realModule = await import(absFilePath)
+    return realModule
   } catch (e) {
     log.error('HotImport', 'importFile(%s) rejected: %s', absFilePath, e)
+    throw e
   }
 }
 
