@@ -13,7 +13,7 @@ export const proxyStore   = {} as KVStore
 export const watcherStore = {} as KVStore
 
 export async function refreshImport(absFilePath: string): Promise<void> {
-  log.verbose('HotImport', 'refreshImport(%s)', absFilePath)
+  log.silly('HotImport', 'refreshImport(%s)', absFilePath)
   const oldCache = purgeRequireCache(absFilePath)
   try {
     const refreshedModule     = await importFile(absFilePath)
@@ -28,7 +28,7 @@ export async function refreshImport(absFilePath: string): Promise<void> {
   } catch (e) {
     log.error('HotImport', 'refreshImport(%s) exception: %s', absFilePath, e)
     restoreRequireCache(absFilePath, oldCache)
-    log.info('HotImport', 'refreshImport(%s) keep using the latest usable version', absFilePath)
+    log.error('HotImport', 'refreshImport(%s) keep using the latest usable version', absFilePath)
   }
 }
 
@@ -58,7 +58,7 @@ export async function hotImport(modulePathRelativeToCaller: string | null, watch
   }
 
   if (absFilePath in moduleStore) {
-    log.verbose('HotImport', 'hotImport() moduleStore[%s] already exist.', absFilePath)
+    log.silly('HotImport', 'hotImport() moduleStore[%s] already exist.', absFilePath)
     return
   }
 
@@ -75,10 +75,10 @@ export async function hotImport(modulePathRelativeToCaller: string | null, watch
 }
 
 export function makeHot(absFilePath: string): void {
-  log.verbose('HotImport', 'makeHot(%s)', absFilePath)
+  log.silly('HotImport', 'makeHot(%s)', absFilePath)
 
   if (watcherStore[absFilePath]) {
-    log.verbose('HotImport', `makeHot(${absFilePath}) it's already hot, skip it`)
+    log.silly('HotImport', `makeHot(${absFilePath}) it's already hot, skip it`)
     return
   }
 
@@ -88,7 +88,7 @@ export function makeHot(absFilePath: string): void {
   watcherStore[absFilePath] = watcher
 
   function onChange(eventType: 'rename' | 'change', filename: string) {
-    log.verbose('HotImport', 'makeHot(%s) onChange(%s, %s)', absFilePath, eventType, filename)
+    log.silly('HotImport', 'makeHot(%s) onChange(%s, %s)', absFilePath, eventType, filename)
     if (eventType !== 'change') {
       return
     }
@@ -97,12 +97,12 @@ export function makeHot(absFilePath: string): void {
     try {
       size = fs.statSync(absFilePath).size
     } catch (e) {
-      log.verbose('HotImport', 'makeHot() onChange() fs.statSync(%s) exception: %s',
+      log.silly('HotImport', 'makeHot() onChange() fs.statSync(%s) exception: %s',
                             absFilePath, e)
     }
     // change event might fire multiple times, one for create(with zero size), others for write.
     if (size === 0) {
-      log.verbose('HotImport', 'makeHot() onChange() fs.statSync(%s) size:0', absFilePath)
+      log.silly('HotImport', 'makeHot() onChange() fs.statSync(%s) size:0', absFilePath)
       return
     }
     refreshImport(absFilePath)
@@ -113,7 +113,7 @@ export function makeCold(absFilePath: string) : void
 export function makeCold(mod: any)            : void
 
 export function makeCold(absFilePathOrMod: string | any): void {
-  log.verbose('HotImport', 'makeCold(%s)', absFilePathOrMod)
+  log.silly('HotImport', 'makeCold(%s)', absFilePathOrMod)
 
   let absFilePath: string
   if (typeof absFilePathOrMod === 'string') { // filePath
@@ -127,7 +127,7 @@ export function makeCold(absFilePathOrMod: string | any): void {
     watcher.close()
     delete watcherStore[absFilePath]
   } else {
-    log.verbose('HotImport', 'makeCold(%s) already cold.', absFilePath)
+    log.silly('HotImport', 'makeCold(%s) already cold.', absFilePath)
   }
 
   return
@@ -143,19 +143,23 @@ export function makeCold(absFilePathOrMod: string | any): void {
 }
 
 export function makeColdAll(): void {
+  log.verbose('HotImport', 'makeColdAll()')
+
   for (const file in watcherStore) {
     makeCold(file)
   }
 }
 
 export function makeHotAll(): void {
+  log.verbose('HotImport', 'makeHotAll()')
+
   for (const file in watcherStore) {
     makeHot(file)
   }
 }
 
 export function cloneProperties(dst: any, src: any) {
-  log.verbose('HotImport', 'cloneProperties()')
+  log.silly('HotImport', 'cloneProperties()')
 
   for (const prop in src) {
     log.silly('HotImport', 'cloneProperties() cloning %s', prop)
@@ -169,6 +173,8 @@ export function cloneProperties(dst: any, src: any) {
 
 // resolve filename based on caller's __dirname
 export function callerResolve(filePath: string, callerFileExcept?: string): string {
+  log.verbose('HotImport', 'callerResolve(%s, %s)', filePath, callerFileExcept)
+
   if (path.isAbsolute(filePath)) {
     return filePath
   }
@@ -215,21 +221,21 @@ export function newCall(cls: any, ..._: any[]) {
 }
 
 export function initProxyModule(absFilePath: string): any {
-  log.verbose('HotImport', 'initProxyModule(%s)', absFilePath)
+  log.silly('HotImport', 'initProxyModule(%s)', absFilePath)
 
   if (!(absFilePath in moduleStore)) {
     throw new Error(`moduleStore has no ${absFilePath}!`)
   }
 
   const proxyModule = function (this: any, ...args: any[]): any {
-    log.verbose('HotImport', 'initProxyModule() proxyModule()')
+    log.silly('HotImport', 'initProxyModule() proxyModule()')
 
     let realModule = moduleStore[absFilePath]
 
     // use default by default.
     // `hotMod = hotImport(...) v.s. import hotMod from '...'
     if (typeof realModule.default === 'function') {
-      log.verbose('HotImport', 'initProxyModule() proxyModule() using default export')
+      log.silly('HotImport', 'initProxyModule() proxyModule() using default export')
       realModule = realModule.default
     }
 
@@ -247,7 +253,7 @@ export function initProxyModule(absFilePath: string): any {
 }
 
 export async function importFile(absFilePath: string): Promise<any> {
-  log.verbose('HotImport', 'importFile(%s)', absFilePath)
+  log.silly('HotImport', 'importFile(%s)', absFilePath)
 
   if (!path.isAbsolute(absFilePath)) {
     throw new Error('must be absolute path!')
@@ -261,7 +267,7 @@ export async function importFile(absFilePath: string): Promise<any> {
 }
 
 export function purgeRequireCache(absFilePath: string): any {
-  log.verbose('HotImport', 'purgeRequireCache(%s)', absFilePath)
+  log.silly('HotImport', 'purgeRequireCache(%s)', absFilePath)
   const mod = require.resolve(absFilePath)
   const oldCache = require.cache[mod]
   if (!oldCache) {
@@ -272,7 +278,7 @@ export function purgeRequireCache(absFilePath: string): any {
 }
 
 export function restoreRequireCache(absFilePath: string, cache: any): void {
-  log.verbose('HotImport', 'restoreRequireCache(%s, cache)', absFilePath)
+  log.silly('HotImport', 'restoreRequireCache(%s, cache)', absFilePath)
   const mod = require.resolve(absFilePath)
   require.cache[mod] = cache
 }
