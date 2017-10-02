@@ -117,14 +117,14 @@ await hotImport('./mod', false)
 1. Do `const hotMod = await hotImport()`; Do NOT `const { mod } = await hotImport()`
 1. Do `hotMod.method()` to call a method inside hot module; Do NOT `const method = hotMod.method; method()`
 
-### 2. `hotImport(modulePath: string, watch: boolean): void`
+### 2. `hotImport(modulePath: string, watch: boolean): Promise<void>`
 
 Turn the module from `modulePath` to be _hot_ or _cold_.
 
 1. If `watch` is `true`, then HMR will be enabled.
 1. If `watch` is `false`, then HMR will be disabled.
 
-### 3. `hotImport(null, watch: boolean): void`
+### 3. `hotImport(null, watch: boolean): Promise<void>`
 
 Turn all the modules that managed by 'hotImport` to be _hot_ or _cold_.
 
