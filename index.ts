@@ -1,9 +1,7 @@
 import {
-  log,
-}                 from 'brolog'
-import {
   callerResolve,
   hotImport,
+  log,
 }                 from './src/hot-import'
 
 export {

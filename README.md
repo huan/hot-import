@@ -226,11 +226,16 @@ ok 35 should instanciated a watcher
 # ok
 ```
 
-SEE ALSO
+INSPIRED
 --------
+
+This module is highly inspired by [@gcaufy](https://github.com/gcaufy) via his blog: [给微信机器人添加热重启功能](http://blog.chatie.io/developer/2017/03/20/added-hot-reload-for-bots.html)
+
+### See Also
+
 1. [Support hot-reload for Wechaty events listeners](https://github.com/Chatie/wechaty/issues/820)
-1. [给微信机器人添加热重启功能](http://blog.chatie.io/developer/2017/03/20/added-hot-reload-for-bots.html)
 1. [make js file hot-reload when use hot-require to load the file](https://github.com/rayosu/hot-require)
+1. [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
 
 RELEASE NOTES
 ---------

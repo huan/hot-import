@@ -2,7 +2,8 @@ import * as fs      from 'fs'
 import * as path    from 'path'
 
 import * as callsites from 'callsites'
-import { log }        from 'brolog'
+import Brolog         from 'brolog'
+export const log = new Brolog()
 
 export interface KVStore {
   [id: string]: any
