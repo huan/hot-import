@@ -225,6 +225,6 @@ test('cloneProperties()', async t => {
   })
 })
 
-test('version()', async t => {
+test('VERSION', async t => {
   t.ok(VERSION.match(/^\d+\.\d+\.\d+$/), 'should get semver version')
 })
