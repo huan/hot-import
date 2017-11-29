@@ -113,8 +113,10 @@ await hotImport('./mod', false)
 ```
 
 **Attention**: 
-1. Do `const hotMod = await hotImport()`; Do NOT `const { mod } = await hotImport()`
-1. Do `hotMod.method()` to call a method inside hot module; Do NOT `const method = hotMod.method; method()`
+1. Do `const hotMod = await hotImport('./file')`; Do NOT `const { mod } = await hotImport('./file')`
+1. Do `const v = hotMod.method()` to call a method inside hot module;
+1. Do `console.log(hotMod.constant)` to get a value inside hot module;
+1. Do `const c = new hotMod.cls()` to instanciate a new instance of class;
 
 ### 2. `hotImport(modulePath: string, watch: boolean): Promise<void>`
 
