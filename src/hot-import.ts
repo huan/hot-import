@@ -73,7 +73,10 @@ export async function hotImport(modulePathRelativeToCaller: string | null, watch
   moduleStore[absFilePath] = realModule
   proxyStore [absFilePath] = initProxyModule(absFilePath)
 
-  cloneProperties(proxyStore[absFilePath], moduleStore[absFilePath])
+  cloneProperties(
+    proxyStore[absFilePath],
+    moduleStore[absFilePath],
+  )
 
   makeHot(absFilePath)
 
@@ -167,10 +170,16 @@ export function makeHotAll(): void {
 export function cloneProperties(dst: any, src: any) {
   log.silly('HotImport', 'cloneProperties()')
 
+  for (const prop in dst) {
+    log.silly('HotImport', 'cloneProperties() cleaning dst.%s', prop)
+    delete dst[prop]
+  }
+
   for (const prop in src) {
     log.silly('HotImport', 'cloneProperties() cloning %s', prop)
     dst[prop] = src[prop]
   }
+
   if (src.prototype) {
     log.silly('HotImport', 'cloneProperties() cloning prototype')
     dst.prototype = src.prototype
