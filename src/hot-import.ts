@@ -1,10 +1,8 @@
 import * as fs      from 'fs'
 import * as path    from 'path'
 
+import { log }        from 'brolog'
 import * as callsites from 'callsites'
-import Brolog         from 'brolog'
-export const log = new Brolog()
-
 import * as readPkgUp from 'read-pkg-up'
 
 const pkg = readPkgUp.sync({ cwd: __dirname }).pkg
@@ -304,4 +302,7 @@ export function restoreRequireCache(absFilePath: string, cache: any): void {
   require.cache[mod] = cache
 }
 
+export {
+  log,
+}
 export default hotImport
