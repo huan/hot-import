@@ -29,6 +29,7 @@
   , "include": [
       "index.ts"
     , "src/**/*.ts"
+    , "scripts/**/*.ts"
     , "tests/**/*.ts"
   ]
   , "exclude": [
