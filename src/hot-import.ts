@@ -184,7 +184,9 @@ export function cloneProperties(dst: any, src: any) {
   }
 }
 
-// resolve filename based on caller's __dirname
+/**
+ * Resolve filename based on caller's __dirname
+ */
 export function callerResolve(filePath: string, callerFileExcept?: string): string {
   log.verbose('HotImport', 'callerResolve(%s, %s)', filePath, callerFileExcept)
 
@@ -201,8 +203,17 @@ export function callerResolve(filePath: string, callerFileExcept?: string): stri
   for (const callsite of callsites()) {
     const file = callsite.getFileName()
     const type = callsite.getTypeName()
+    log.silly('HotImport', 'callerResolve() callsites() file=%s, type=%s', file, type)
 
-    if (file && type) {
+    /**
+     * type sometimes is null?
+     * callsites() file=/home/zixia/chatie/wechaty/node_modules/hot-import/dist/src/hot-import.js, type=Object
+     * callsites() file=/home/zixia/chatie/wechaty/src/puppet/puppet.ts, type=PuppetPuppeteer
+     * callsites() file=/home/zixia/chatie/wechaty/src/puppet-puppeteer/puppet-puppeteer.ts, type=null
+     * callsites() file=/home/zixia/chatie/wechaty/src/wechaty.ts, type=Wechaty
+     * callerFile=/home/zixia/chatie/wechaty/src/wechaty.ts
+     */
+    if (file /* && type */) {
       let skip = false
       fileSkipList.some(skipFile => !!(skip = (skipFile === file)))
       if (skip) {
@@ -216,6 +227,7 @@ export function callerResolve(filePath: string, callerFileExcept?: string): stri
   if (!callerFile) {
     throw new Error('not found caller file?')
   }
+  log.silly('HotImport', 'callerResolve() callerFile=%s', callerFile)
   const callerDir  = path.dirname(callerFile)
 
   const absFilePath = path.resolve(
