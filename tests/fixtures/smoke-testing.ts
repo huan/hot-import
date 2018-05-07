@@ -1,8 +1,8 @@
-const assert = require('assert')
-const fs     = require('fs')
-const path   = require('path')
+import * as assert from 'assert'
+import * as fs     from 'fs'
+import * as path   from 'path'
 
-const { hotImport } = require('hot-import')
+import { hotImport } from 'hot-import'
 
 async function main() {
   const MODULE_CODE_42 = 'module.exports = () => 42'

@@ -34,6 +34,7 @@
   , "exclude": [
       "dist"
     , "node_modules"
+    , "tests/fixtures/**/*.ts"
   ]
   , "compileOnSave": false
   , "atom": {
