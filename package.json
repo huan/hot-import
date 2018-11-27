@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zixia/hot-import.git"
+    "url": "git+https://github.com/huan/hot-import.git"
   },
   "keywords": [
     "hot",
@@ -34,9 +34,9 @@
   "author": "Huan LI <zixia@zixia.net>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/zixia/hot-import/issues"
+    "url": "https://github.com/huan/hot-import/issues"
   },
-  "homepage": "https://github.com/zixia/hot-import#readme",
+  "homepage": "https://github.com/huan/hot-import#readme",
   "dependencies": {
     "brolog": "^1.2.6",
     "callsites": "^2.0.0",
