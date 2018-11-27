@@ -40,26 +40,26 @@
   "dependencies": {
     "brolog": "^1.2.6",
     "callsites": "^2.0.0",
-    "read-pkg-up": "^2.0.0"
+    "read-pkg-up": "^4.0.0"
   },
   "devDependencies": {
     "@types/blue-tape": "^0.1.31",
     "@types/callsites": "^2.0.0",
-    "@types/node": "^8.0.31",
-    "@types/read-pkg-up": "^2.0.0",
+    "@types/node": "^10.7.0",
+    "@types/read-pkg-up": "^3.0.1",
     "@types/rimraf": "^2.0.2",
     "@types/semver": "^5.5.0",
     "blue-tape": "^1.0.0",
-    "check-node-version": "^2.1.0",
+    "check-node-version": "^3.2.0",
     "cross-env": "^5.0.5",
     "git-scripts": "git+https://github.com/nkzawa/git-scripts.git",
     "rimraf": "^2.6.2",
     "semver": "^5.5.0",
-    "shx": "^0.2.2",
-    "source-map-support": "^0.4.18",
-    "ts-node": "^3.3.0",
+    "shx": "^0.3.2",
+    "source-map-support": "^0.5.8",
+    "ts-node": "^7.0.1",
     "tslint": "^5.7.0",
-    "typescript": "^2.5.3"
+    "typescript": "^3.0.1"
   },
   "files": [
     "bin/",
