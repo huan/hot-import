@@ -39,7 +39,7 @@
   "homepage": "https://github.com/huan/hot-import#readme",
   "dependencies": {
     "brolog": "^1.2.6",
-    "callsites": "^2.0.0",
+    "callsites": "^3.0.0",
     "read-pkg-up": "^4.0.0"
   },
   "devDependencies": {
