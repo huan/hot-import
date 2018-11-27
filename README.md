@@ -132,7 +132,7 @@ Turn all the modules that managed by `hotImport` to be _hot_ or _cold_.
 TEST
 ----
 
-[![Build Status](https://travis-ci.org/zixia/hot-import.svg?branch=master)](https://travis-ci.org/zixia/hot-import) [![Windows Build status](https://img.shields.io/appveyor/ci/zixia/hot-import/master.svg?label=Windows)](https://ci.appveyor.com/project/zixia/hot-import) [![Greenkeeper badge](https://badges.greenkeeper.io/zixia/hot-import.svg)](https://greenkeeper.io/)
+[![Build Status](https://travis-ci.org/zixia/hot-import.svg?branch=master)](https://travis-ci.org/zixia/hot-import) [![Windows Build status](https://img.shields.io/appveyor/ci/zixia/hot-import/master.svg?label=Windows)](https://ci.appveyor.com/project/zixia/hot-import) [![Greenkeeper badge](https://badges.greenkeeper.io/huan/hot-import.svg)](https://greenkeeper.io/)
 
 This module is fully tested under Linux/Mac/Windows.
 
