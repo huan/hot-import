@@ -2,7 +2,7 @@ import * as fs      from 'fs'
 import * as path    from 'path'
 
 import { log }        from 'brolog'
-import * as callsites from 'callsites'
+import callsites      from 'callsites'
 import * as readPkgUp from 'read-pkg-up'
 
 const pkg = readPkgUp.sync({ cwd: __dirname }).pkg

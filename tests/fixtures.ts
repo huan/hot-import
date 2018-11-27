@@ -1,5 +1,7 @@
 // https://github.com/Microsoft/TypeScript/issues/14151#issuecomment-280812617
-(<any>Symbol).asyncIterator = Symbol.asyncIterator || Symbol.for('Symbol.asyncIterator')
+if (!(<any>Symbol).asyncIterator) {
+  (<any>Symbol).asyncIterator = Symbol.for('Symbol.asyncIterator')
+}
 
 import * as fs    from 'fs'
 import * as os    from 'os'
