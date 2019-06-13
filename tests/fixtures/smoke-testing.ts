@@ -13,10 +13,12 @@ async function main() {
   try {
     fs.writeFileSync(MODULE_FILE, MODULE_CODE_42)
     const hotMod = await hotImport(MODULE_FILE)
+    const hotModDup = await hotImport(MODULE_FILE)
 
     const fourtyTwo = hotMod()
     console.log(fourtyTwo)  // Output: fourtyTwo = 42
     assert(fourtyTwo === 42, 'first get 42')
+    assert(hotModDup() === 42, 'first get 42')
 
     await new Promise(resolve => fs.writeFile(MODULE_FILE, MODULE_CODE_17, () => resolve()))
 

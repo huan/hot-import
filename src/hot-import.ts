@@ -63,7 +63,7 @@ export async function hotImport(modulePathRelativeToCaller: string | null, watch
 
   if (absFilePath in moduleStore) {
     log.silly('HotImport', 'hotImport() moduleStore[%s] already exist.', absFilePath)
-    return
+    return proxyStore[absFilePath]
   }
 
   const realModule = await importFile(absFilePath)
