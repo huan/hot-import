@@ -5,7 +5,7 @@ import { log }        from 'brolog'
 import callsites      from 'callsites'
 import * as readPkgUp from 'read-pkg-up'
 
-const pkg = readPkgUp.sync({ cwd: __dirname }).pkg
+const pkg = readPkgUp.sync({ cwd: __dirname })!.package
 export const VERSION = pkg.version as string
 
 export interface KVStore {
