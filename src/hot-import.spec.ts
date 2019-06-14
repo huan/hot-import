@@ -33,6 +33,7 @@ import {
 // log.level('silly')
 
 const EXPECTED_TEXT = 'testing123'
+const WAIT_MAGIC_NUMBER = 150 // wait this time to wait event loop dispatch fs.watch
 
 test('callerResolve()', async t => {
   const RELATIVE_FILE_PATH = './test'
@@ -86,7 +87,7 @@ test('hotImport()', async t => {
         t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
       }
 
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, WAIT_MAGIC_NUMBER))
       const result = new cls(EXPECTED_TEXT)
       t.equal(result.text, EXPECTED_TEXT, 'should get expected values from instance of class in module')
       t.equal(result.id, info.returnValue, 'should import module class with right id:' + info.returnValue)
@@ -113,7 +114,7 @@ test('hotImport()', async t => {
         t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
       }
 
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, WAIT_MAGIC_NUMBER))
       t.equal(hotMod.answer, info.returnValue, 'should get expected values from variable in module')
     }
     if (file) {
@@ -138,7 +139,7 @@ test('hotImport()', async t => {
         t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
       }
 
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, WAIT_MAGIC_NUMBER))
       t.equal(hotMod(), info.returnValue, 'should get expected values from the return value of raw func in module')
     }
     if (file) {

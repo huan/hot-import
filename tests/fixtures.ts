@@ -9,6 +9,8 @@ import * as path  from 'path'
 
 import * as rimraf  from 'rimraf'
 
+const WAIT_MAGIC_NUMBER = 150 // wait this time to wait event loop dispatch fs.watch
+
 export interface ModuleInfo {
   file        : string,
   returnValue : any,
@@ -155,6 +157,6 @@ export function* tmpDir(): IterableIterator<string> {
           console.error('rimraf error: ', e)
         }
       })}
-      , 100)
+      , WAIT_MAGIC_NUMBER)
   }
 }
