@@ -9,7 +9,7 @@ import * as path  from 'path'
 
 import * as rimraf  from 'rimraf'
 
-const WAIT_MAGIC_NUMBER = 150 // wait this time to wait event loop dispatch fs.watch
+const WAIT_MAGIC_NUMBER = 250 // wait this time to wait event loop dispatch fs.watch
 
 export interface ModuleInfo {
   file        : string,

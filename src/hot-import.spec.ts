@@ -33,7 +33,7 @@ import {
 // log.level('silly')
 
 const EXPECTED_TEXT = 'testing123'
-const WAIT_MAGIC_NUMBER = 150 // wait this time to wait event loop dispatch fs.watch
+const WAIT_MAGIC_NUMBER = 250 // wait this time to wait event loop dispatch fs.watch
 
 test('callerResolve()', async t => {
   const RELATIVE_FILE_PATH = './test'

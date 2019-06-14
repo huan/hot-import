@@ -14,7 +14,7 @@ import {
 }                                   from './fixtures'
 
 const FILENAME = 'test.data'
-const WAIT_MAGIC_NUMBER = 150 // wait this time to wait event loop dispatch fs.watch
+const WAIT_MAGIC_NUMBER = 250 // wait this time to wait event loop dispatch fs.watch
 
 async function write(file: string, data: string | number): Promise<void> {
   return new Promise<void>((resolve, reject) => {
