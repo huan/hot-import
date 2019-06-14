@@ -155,6 +155,6 @@ export function* tmpDir(): IterableIterator<string> {
           console.error('rimraf error: ', e)
         }
       })}
-      , 50)
+      , 100)
   }
 }
