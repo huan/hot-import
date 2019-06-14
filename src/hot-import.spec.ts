@@ -86,7 +86,7 @@ test('hotImport()', async t => {
         t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
       }
 
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise(resolve => setTimeout(resolve, 50))
       const result = new cls(EXPECTED_TEXT)
       t.equal(result.text, EXPECTED_TEXT, 'should get expected values from instance of class in module')
       t.equal(result.id, info.returnValue, 'should import module class with right id:' + info.returnValue)
@@ -113,7 +113,7 @@ test('hotImport()', async t => {
         t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
       }
 
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise(resolve => setTimeout(resolve, 50))
       t.equal(hotMod.answer, info.returnValue, 'should get expected values from variable in module')
     }
     if (file) {
@@ -138,7 +138,7 @@ test('hotImport()', async t => {
         t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
       }
 
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise(resolve => setTimeout(resolve, 50))
       t.equal(hotMod(), info.returnValue, 'should get expected values from the return value of raw func in module')
     }
     if (file) {

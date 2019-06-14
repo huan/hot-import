@@ -149,10 +149,12 @@ export function* tmpDir(): IterableIterator<string> {
   try {
     yield dir
   } finally {
-    rimraf(dir, e => {
-      if (e) {
-        console.error('rimraf error: ', e)
-      }
-    })
+    setTimeout(() => {
+      rimraf(dir, e => {
+        if (e) {
+          console.error('rimraf error: ', e)
+        }
+      })}
+      , 50)
   }
 }

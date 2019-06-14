@@ -86,7 +86,7 @@ test('1/4. fs.writeFileSync then fs.writeFile', async t => {
     await write(file, Math.random())
 
   }
-  await new Promise(r => setTimeout(r, 100))
+  await new Promise(r => setTimeout(r, 50))
 
   t.ok(changeCounter >= 1, 'should monitored file change event at least once')
   // t.ok(changeCounter <= 2, 'should monitored file change event at most twice')
@@ -117,7 +117,7 @@ test('2/4. fs.writeFileSync then fs.writeFileSync', async t => {
     // change the file
     fs.writeFileSync(file, Math.random())
   }
-  await new Promise(resolve => setTimeout(resolve, 10))
+  await new Promise(resolve => setTimeout(resolve, 50))
 
   // change event is not consistant through Windows & Linux: Windows fire twice, Linux fire once.
   // t.equal(changeCounter, 1, 'should monitored 1 change event')
@@ -153,7 +153,7 @@ test('3/4. fs.writeFile then fs.writeFile', async t => {
     await write(file, Math.random())
     await new Promise(setImmediate)
   }
-  await new Promise(setImmediate)
+  await new Promise(resolve => setTimeout(resolve, 50))
 
   t.equal(changeCounter, 1, 'should monitored 1 change event')
   t.equal(renameCounter, 0, 'should monitored 0 rename event')
@@ -184,7 +184,7 @@ test('4/4. fs.writeFile then fs.writeFileSync', async t => {
     // change the file
     fs.writeFileSync(file, Math.random())
   }
-  await new Promise(resolve => setTimeout(resolve, 10))
+  await new Promise(resolve => setTimeout(resolve, 50))
 
   // change event is not consistant through Windows & Linux: Windows fire twice, Linux fire once.
   // t.equal(changeCounter, 1, 'should monitored 1 file change event')
@@ -216,7 +216,7 @@ test('fixtures', async t => {
       break // break on the 2nd loop
     }
   }
-  await new Promise(r => setTimeout(r, 20))
+  await new Promise(r => setTimeout(r, 50))
 
   t.ok(changeCounter >= 1, 'should monitored file change event at least once')
   // t.ok(changeCounter <= 2, 'should monitored file change event at most twice')
