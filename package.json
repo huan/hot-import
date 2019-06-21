@@ -1,6 +1,6 @@
 {
   "name": "hot-import",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "description": "Hot Module Replacement (HMR) for Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
