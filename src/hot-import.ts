@@ -1,12 +1,14 @@
+/* eslint no-whitespace-before-property: off */
+/* eslint import/export: off */
+/* eslint no-useless-return: off */
+
 import * as fs      from 'fs'
 import * as path    from 'path'
 
 import { log }        from 'brolog'
 import callsites      from 'callsites'
-import * as readPkgUp from 'read-pkg-up'
 
-const pkg = readPkgUp.sync({ cwd: __dirname })!.package
-export const VERSION = pkg.version as string
+export { VERSION } from './version'
 
 export interface KVStore {
   [id: string]: any
@@ -16,7 +18,7 @@ export const moduleStore  = {} as KVStore
 export const proxyStore   = {} as KVStore
 export const watcherStore = {} as KVStore
 
-export async function refreshImport(absFilePath: string): Promise<void> {
+export async function refreshImport (absFilePath: string): Promise<void> {
   log.silly('HotImport', 'refreshImport(%s)', absFilePath)
   const oldCache = purgeRequireCache(absFilePath)
   try {
@@ -24,7 +26,7 @@ export async function refreshImport(absFilePath: string): Promise<void> {
     moduleStore[absFilePath]  = refreshedModule
 
     cloneProperties(
-      proxyStore [absFilePath],
+      proxyStore[absFilePath],
       moduleStore[absFilePath],
     )
 
@@ -36,10 +38,10 @@ export async function refreshImport(absFilePath: string): Promise<void> {
   }
 }
 
-export async function hotImport(modulePathRelativeToCaller: string)                        : Promise<any>
-export async function hotImport(modulePathRelativeToCaller: string | null, watch: boolean) : Promise<void>
+export async function hotImport (modulePathRelativeToCaller: string)                        : Promise<any>
+export async function hotImport (modulePathRelativeToCaller: string | null, watch: boolean) : Promise<void>
 
-export async function hotImport(modulePathRelativeToCaller: string | null, watch = true): Promise<any> {
+export async function hotImport (modulePathRelativeToCaller: string | null, watch = true): Promise<any> {
   log.verbose('HotImport', 'hotImport(%s, %s)', modulePathRelativeToCaller, watch)
 
   if (!modulePathRelativeToCaller) {
@@ -81,7 +83,7 @@ export async function hotImport(modulePathRelativeToCaller: string | null, watch
   return proxyStore[absFilePath]
 }
 
-export function makeHot(absFilePath: string): void {
+export function makeHot (absFilePath: string): void {
   log.silly('HotImport', 'makeHot(%s)', absFilePath)
 
   if (watcherStore[absFilePath]) {
@@ -94,7 +96,7 @@ export function makeHot(absFilePath: string): void {
 
   watcherStore[absFilePath] = watcher
 
-  function onChange(eventType: 'rename' | 'change', filename: string) {
+  function onChange (eventType: 'rename' | 'change', filename: string) {
     log.silly('HotImport', 'makeHot(%s) onChange(%s, %s)', absFilePath, eventType, filename)
     if (eventType !== 'change') {
       return
@@ -105,21 +107,21 @@ export function makeHot(absFilePath: string): void {
       size = fs.statSync(absFilePath).size
     } catch (e) {
       log.silly('HotImport', 'makeHot() onChange() fs.statSync(%s) exception: %s',
-                            absFilePath, e)
+        absFilePath, e)
     }
     // change event might fire multiple times, one for create(with zero size), others for write.
     if (size === 0) {
       log.silly('HotImport', 'makeHot() onChange() fs.statSync(%s) size:0', absFilePath)
       return
     }
-    refreshImport(absFilePath)
+    refreshImport(absFilePath).catch(e => log.error('HotImport', 'makeHot() refreshImport rejection: %s', e && e.message))
   }
 }
 
-export function makeCold(absFilePath: string) : void
-export function makeCold(mod: any)            : void
+export function makeCold (absFilePath: string) : void
+export function makeCold (mod: any)            : void
 
-export function makeCold(absFilePathOrMod: string | any): void {
+export function makeCold (absFilePathOrMod: string | any): void {
   log.silly('HotImport', 'makeCold(%s)', absFilePathOrMod)
 
   let absFilePath: string
@@ -139,7 +141,7 @@ export function makeCold(absFilePathOrMod: string | any): void {
 
   return
 
-  function mod2file(mod: any) {
+  function mod2file (mod: any) {
     for (const file in proxyStore) {
       if (proxyStore[file] === mod) {
         return file
@@ -149,7 +151,7 @@ export function makeCold(absFilePathOrMod: string | any): void {
   }
 }
 
-export function makeColdAll(): void {
+export function makeColdAll (): void {
   log.verbose('HotImport', 'makeColdAll()')
 
   for (const file in watcherStore) {
@@ -157,7 +159,7 @@ export function makeColdAll(): void {
   }
 }
 
-export function makeHotAll(): void {
+export function makeHotAll (): void {
   log.verbose('HotImport', 'makeHotAll()')
 
   for (const file in watcherStore) {
@@ -165,7 +167,7 @@ export function makeHotAll(): void {
   }
 }
 
-export function cloneProperties(dst: any, src: any) {
+export function cloneProperties (dst: any, src: any) {
   log.silly('HotImport', 'cloneProperties()')
 
   for (const prop in dst) {
@@ -187,7 +189,7 @@ export function cloneProperties(dst: any, src: any) {
 /**
  * Resolve filename based on caller's __dirname
  */
-export function callerResolve(filePath: string, callerFileExcept?: string): string {
+export function callerResolve (filePath: string, callerFileExcept?: string): string {
   log.verbose('HotImport', 'callerResolve(%s, %s)', filePath, callerFileExcept)
 
   if (path.isAbsolute(filePath)) {
@@ -237,15 +239,18 @@ export function callerResolve(filePath: string, callerFileExcept?: string): stri
   return absFilePath
 }
 
-// create an object instance (via the new operator),
-// but pass an arbitrary number of arguments to the constructor.
-// https://stackoverflow.com/a/8843181/1123955
-export function newCall(cls: any, ..._: any[]) {
-  const instance = new (Function.prototype.bind.apply(cls, arguments))
+/**
+ * create an object instance (via the new operator),
+ * but pass an arbitrary number of arguments to the constructor.
+ * https://stackoverflow.com/a/8843181/1123955
+ */
+// eslint-disable-next-line
+export function newCall (cls: any, ..._: any[]) {
+  const instance = new (Function.prototype.bind.apply(cls, arguments))()
   return instance
 }
 
-export function initProxyModule(absFilePath: string): any {
+export function initProxyModule (absFilePath: string): any {
   log.silly('HotImport', 'initProxyModule(%s)', absFilePath)
 
   if (!(absFilePath in moduleStore)) {
@@ -281,7 +286,7 @@ export function initProxyModule(absFilePath: string): any {
   return proxyModule
 }
 
-export async function importFile(absFilePath: string): Promise<any> {
+export async function importFile (absFilePath: string): Promise<any> {
   log.silly('HotImport', 'importFile(%s)', absFilePath)
 
   if (!path.isAbsolute(absFilePath)) {
@@ -297,7 +302,7 @@ export async function importFile(absFilePath: string): Promise<any> {
   }
 }
 
-export function purgeRequireCache(absFilePath: string): any {
+export function purgeRequireCache (absFilePath: string): any {
   log.silly('HotImport', 'purgeRequireCache(%s)', absFilePath)
   const mod = require.resolve(absFilePath)
   const oldCache = require.cache[mod]
@@ -308,7 +313,7 @@ export function purgeRequireCache(absFilePath: string): any {
   return oldCache
 }
 
-export function restoreRequireCache(absFilePath: string, cache: any): void {
+export function restoreRequireCache (absFilePath: string, cache: any): void {
   log.silly('HotImport', 'restoreRequireCache(%s, cache)', absFilePath)
   const mod = require.resolve(absFilePath)
   require.cache[mod] = cache

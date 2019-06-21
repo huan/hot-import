@@ -2,9 +2,16 @@ import * as assert from 'assert'
 import * as fs     from 'fs'
 import * as path   from 'path'
 
-import { hotImport } from 'hot-import'
+import {
+  hotImport,
+  VERSION,
+}             from 'hot-import'
 
 async function main() {
+  if (VERSION === '0.0.0') {
+    throw new Error('VERSION should be set before publishing')
+  }
+
   const MODULE_CODE_42 = 'module.exports = () => 42'
   const MODULE_CODE_17 = 'module.exports.default = () => 17'
 
@@ -36,8 +43,8 @@ async function main() {
 }
 
 main()
-.then(process.exit)
-.catch(e => {
-  console.error(e)
-  process.exit(1)
-})
+  .then(process.exit)
+  .catch(e => {
+    console.error(e)
+    process.exit(1)
+  })

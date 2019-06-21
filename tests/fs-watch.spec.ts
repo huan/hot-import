@@ -15,7 +15,7 @@ import {
 
 const FILENAME = 'test.data'
 
-async function write(file: string, data: string | number): Promise<void> {
+async function write (file: string, data: string | number): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     log.verbose('TestFsWatch', 'write(%s) ...', file)
     fs.writeFile(file, data, err => {
@@ -28,23 +28,23 @@ async function write(file: string, data: string | number): Promise<void> {
   })
 }
 
-async function watch(
+async function watch (
   file     : string,
   cbChange : (...args: any[]) => void,
   cbRename : (...args: any[]) => void,
 ): Promise<fs.FSWatcher> {
   const watcher = fs.watch(file)
-  .on('error', e => {
-    log.verbose('TestFsWatch', 'watch(%s) watcher.on(error): %s', file, e)
-  })
-  .on('change', onChange)
-  .on('rename', cbRename)
+    .on('error', e => {
+      log.verbose('TestFsWatch', 'watch(%s) watcher.on(error): %s', file, e)
+    })
+    .on('change', onChange)
+    .on('rename', cbRename)
 
   // wait all io event loop to be cleared before return watcher
   await new Promise(setImmediate)
   return watcher
 
-  function onChange(eventType: 'rename' | 'change') {
+  function onChange (eventType: 'rename' | 'change') {
     let size
     try {
       // the first change event is create a size 0 file
@@ -52,10 +52,10 @@ async function watch(
       // so we also might get a size>0 at here.
       size = fs.statSync(file).size
       log.verbose('TestFsWatch', 'watch(%s) onChange(%s) size: %s',
-                                  file, eventType, size)
+        file, eventType, size)
     } catch (e) {
       log.verbose('TestFsWatch', 'watch(%s) onChange(%s) fs.statSync() exception: %s',
-                                  file, eventType, e)
+        file, eventType, e)
       return
     }
     if (eventType !== 'change' || !size) {
@@ -86,7 +86,7 @@ test('1/4. fs.writeFileSync then fs.writeFile', async t => {
     await write(file, Math.random())
 
   }
-  await new Promise(r => setTimeout(r, 100))
+  await new Promise(resolve => setTimeout(resolve, 100))
 
   t.ok(changeCounter >= 1, 'should monitored file change event at least once')
   // t.ok(changeCounter <= 2, 'should monitored file change event at most twice')
@@ -216,7 +216,7 @@ test('fixtures', async t => {
       break // break on the 2nd loop
     }
   }
-  await new Promise(r => setTimeout(r, 20))
+  await new Promise(resolve => setTimeout(resolve, 20))
 
   t.ok(changeCounter >= 1, 'should monitored file change event at least once')
   // t.ok(changeCounter <= 2, 'should monitored file change event at most twice')

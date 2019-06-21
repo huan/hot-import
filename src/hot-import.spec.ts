@@ -62,7 +62,7 @@ test('callerResolve()', async t => {
 
 test('newCall()', async t => {
   class TextClass {
-    constructor(public text: string) {}
+    constructor (public text: string) {}
   }
   const textClass = newCall(TextClass, EXPECTED_TEXT)
   t.equal(textClass.text, EXPECTED_TEXT, 'should instanciate class with constructor arguments')
@@ -70,7 +70,7 @@ test('newCall()', async t => {
 
 test('hotImport()', async t => {
   t.test('class module(export=)', async t => {
-    let file, cls
+    let file, Cls
     for await (const info of changingClassModuleFixtures()) {
       /**
        * io event loop wait for fs.watch
@@ -79,15 +79,15 @@ test('hotImport()', async t => {
       await new Promise(setImmediate) // the first one is enough for Linux(Ubuntu 17.04)
       await new Promise(setImmediate) // the second one is needed for Windows 7
 
-      if (!cls) {
+      if (!Cls) {
         file = info.file
-        cls = await hotImport(file)
+        Cls = await hotImport(file)
       } else {
         t.equal(file, info.file, 'should get same module file for fixtures(change file content only)')
       }
 
       await new Promise(resolve => setTimeout(resolve, 10))
-      const result = new cls(EXPECTED_TEXT)
+      const result = new Cls(EXPECTED_TEXT)
       t.equal(result.text, EXPECTED_TEXT, 'should get expected values from instance of class in module')
       t.equal(result.id, info.returnValue, 'should import module class with right id:' + info.returnValue)
     }
@@ -151,7 +151,7 @@ test('hotImport()', async t => {
     const DEFAULT_EXPORT_ONLY_MODULE_FILE = '../tests/fixtures/default-export-module'
     const mod = await hotImport(DEFAULT_EXPORT_ONLY_MODULE_FILE)
     t.equal(mod(), EXPECTED_RETURN_VALUE, 'should get the default export function return value right')
-    hotImport(DEFAULT_EXPORT_ONLY_MODULE_FILE, false)
+    await hotImport(DEFAULT_EXPORT_ONLY_MODULE_FILE, false).catch(() => t.fail('rejected'))
   })
 
 })
@@ -166,8 +166,8 @@ test('importFile()', async t => {
   })
   t.test('class', async t => {
     for await (const info of changingClassModuleFixtures()) {
-      const m = await importFile(info.file)
-      const result = new m(EXPECTED_TEXT)
+      const Module = await importFile(info.file)
+      const result = new Module(EXPECTED_TEXT)
       t.equal(result.text, EXPECTED_TEXT, 'should instanciated class with constructor argument')
       t.equal(result.id, info.returnValue, 'should import module class with right id')
       break // only test once for importFile
@@ -182,7 +182,7 @@ test('refreshImport()', async t => {
       cls = await importFile(info.file)
 
       moduleStore[info.file] = cls
-      proxyStore [info.file] = initProxyModule(info.file)
+      proxyStore[info.file]  = initProxyModule(info.file)
     } else {
       await refreshImport(info.file)
       t.notEqual(moduleStore[info.file], cls, 'should be refreshed to new value')
@@ -210,7 +210,8 @@ test('purgeRequireCache()', async t => {
 
 test('cloneProperties()', async t => {
   const SRC = { text: EXPECTED_TEXT }
-  const SRC_CLASS = class { constructor(public text: string) {} }
+  /* eslint padded-blocks: off */
+  const SRC_CLASS = class { constructor (public text: string) {} }
 
   t.test('object', async t => {
     const dst = {} as any
@@ -227,4 +228,5 @@ test('cloneProperties()', async t => {
 
 test('VERSION', async t => {
   t.ok(VERSION.match(/^\d+\.\d+\.\d+$/), 'should get semver version')
+  t.equal(VERSION, '0.0.0', 'should be 0.0.0 in source code')
 })
