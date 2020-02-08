@@ -46,7 +46,7 @@
     "@chatie/eslint-config": "^0.8.1",
     "@chatie/git-scripts": "^0.2.5",
     "@chatie/semver": "^0.4.7",
-    "@chatie/tsconfig": "^0.6.1",
+    "@chatie/tsconfig": "^0.8.0",
     "@types/rimraf": "^2.0.2",
     "check-node-version": "^4.0.0",
     "cross-env": "^7.0.0",
