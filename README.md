@@ -1,7 +1,9 @@
-HOT-IMPORT
-----------
+# HOT-IMPORT
 
-[![NPM Version](https://badge.fury.io/js/hot-import.svg)](https://badge.fury.io/js/hot-import) [![Downloads](http://img.shields.io/npm/dm/hot-import.svg?style=flat-square)](https://npmjs.org/package/hot-import) [![Powered by TypeScript](https://img.shields.io/badge/Powered%20By-TypeScript-blue.svg)](https://www.typescriptlang.org/) [![node](https://img.shields.io/node/v/hot-import.svg?maxAge=604800)](https://nodejs.org/) 
+[![NPM Version](https://badge.fury.io/js/hot-import.svg)](https://badge.fury.io/js/hot-import)
+[![Downloads](http://img.shields.io/npm/dm/hot-import.svg?style=flat-square)](https://npmjs.org/package/hot-import)
+[![Powered by TypeScript](https://img.shields.io/badge/Powered%20By-TypeScript-blue.svg)](https://www.typescriptlang.org/)
+[![node](https://img.shields.io/node/v/hot-import.svg?maxAge=604800)](https://nodejs.org/) 
 
 Hot Module Replacement(HMR) for Node.js
 
@@ -17,15 +19,13 @@ _Hot Module Replacement_ (HMR) is a feature to inject updated modules into the a
 
 `hot-import` is a NPM module that enable you to do HMR with just one line of code.
 
-INSTALL
--------
+## INSTALL
 
 ```shell
 $ npm install hot-import
 ```
 
-USAGE
------
+## USAGE
 
 Talk is cheap, show me the code!
 
@@ -82,14 +82,13 @@ Output:
 The above code is in the `example/` directory. Npm script `demo` will run it for you:
 
 ```shell
-$ git clone git@github.com:zixia/hot-import.git
-$ cd hot-import
-$ npm install
-$ npm run demo
+git clone git@github.com:zixia/hot-import.git
+cd hot-import
+npm install
+npm run demo
 ```
 
-API
----
+## API
 
 The only API in this module is `hotImport()`, it will import the module and reload it when it changes.
 
@@ -112,7 +111,8 @@ const hotMod = await hotImport('./mod')
 await hotImport('./mod', false)
 ```
 
-**Attention**: 
+**Attention**:
+
 1. Do `const hotMod = await hotImport('./file')`; Do NOT `const { mod } = await hotImport('./file')`
 1. Do `const v = hotMod.method()` to call a method inside hot module;
 1. Do `console.log(hotMod.constant)` to get a value inside hot module;
@@ -129,10 +129,10 @@ Turn the module from `modulePath` to be _hot_ or _cold_.
 
 Turn all the modules that managed by `hotImport` to be _hot_ or _cold_.
 
-TEST
-----
+## TEST
 
-[![Build Status](https://travis-ci.com/huan/hot-import.svg?branch=master)](https://travis-ci.com/huan/hot-import) [![Windows Build status](https://img.shields.io/appveyor/ci/zixia/hot-import/master.svg?label=Windows)](https://ci.appveyor.com/project/zixia/hot-import) 
+[![Build Status](https://travis-ci.com/huan/hot-import.svg?branch=master)](https://travis-ci.com/huan/hot-import)
+[![Windows Build status](https://img.shields.io/appveyor/ci/zixia/hot-import/master.svg?label=Windows)](https://ci.appveyor.com/project/zixia/hot-import)
 
 This module is fully tested under Linux/Mac/Windows.
 
@@ -228,19 +228,17 @@ ok 35 should instanciated a watcher
 # ok
 ```
 
-INSPIRED
---------
+## INSPIRED
 
 This module is highly inspired by [@gcaufy](https://github.com/gcaufy) via his blog: [给微信机器人添加热重启功能](http://blog.chatie.io/developer/2017/03/20/added-hot-reload-for-bots.html)
 
-### See Also
+## See Also
 
 1. [Support hot-reload for Wechaty events listeners](https://github.com/Chatie/wechaty/issues/820)
 1. [make js file hot-reload when use hot-require to load the file](https://github.com/rayosu/hot-require)
 1. [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
 
-RELEASE NOTES
----------
+## RELEASE NOTES
 
 ### v0.1 Oct, 2017
 
@@ -248,17 +246,15 @@ RELEASE NOTES
 1. Support TypeScript typings
 1. Initial release
 
-AUTHOR
-------
+## AUTHOR
 
-Huan LI \<zixia\@zixia.net\> \(http://linkedin.com/in/zixia\)
+Huan LI \<zixia\@zixia.net\> \(<http://linkedin.com/in/zixia>\)
 
 <a href="http://stackoverflow.com/users/1123955/zixia">
   <img src="http://stackoverflow.com/users/flair/1123955.png" width="208" height="58" alt="profile for zixia at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for zixia at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
 </a>
 
-COPYRIGHT & LICENSE
--------------------
+## COPYRIGHT & LICENSE
 
 * Code & Docs © 2017 Huan LI \<zixia\@zixia.net\>
 * Code released under the Apache-2.0 License

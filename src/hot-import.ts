@@ -187,9 +187,12 @@ export function cloneProperties (dst: any, src: any) {
 }
 
 /**
- * Resolve filename based on caller's __dirname
+ * Resolve the caller filename based on caller's __dirname
  */
-export function callerResolve (filePath: string, callerFileExcept?: string): string {
+export function callerResolve (
+  filePath: string,
+  callerFileExcept?: string,
+): string {
   log.verbose('HotImport', 'callerResolve(%s, %s)', filePath, callerFileExcept)
 
   if (path.isAbsolute(filePath)) {
@@ -217,7 +220,7 @@ export function callerResolve (filePath: string, callerFileExcept?: string): str
      */
     if (file /* && type */) {
       let skip = false
-      fileSkipList.some(skipFile => !!(skip = (skipFile === file)))
+      fileSkipList.some(skipFile => (skip = (skipFile === file)))
       if (skip) {
         continue
       }
