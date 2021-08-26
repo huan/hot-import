@@ -27,10 +27,9 @@
     "sourceMap": true,
   }
   , "include": [
-      "index.ts"
-    , "src/**/*.ts"
-    , "scripts/**/*.ts"
-    , "tests/**/*.ts"
+    "src/**/*.ts",
+    "scripts/**/*.ts",
+    "tests/**/*.ts",
   ]
   , "exclude": [
       "dist"
