@@ -1,6 +1,6 @@
 {
   "name": "hot-import",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Hot Module Replacement (HMR) for Node.js",
   "type": "module",
   "exports": {
