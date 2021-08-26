@@ -22,7 +22,7 @@ _Hot Module Replacement_ (HMR) is a feature to inject updated modules into the a
 ## INSTALL
 
 ```shell
-$ npm install hot-import
+npm install hot-import
 ```
 
 ## USAGE
@@ -239,6 +239,14 @@ This module is highly inspired by [@gcaufy](https://github.com/gcaufy) via his b
 1. [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
 
 ## RELEASE NOTES
+
+### master v0.3
+
+1. ESM & CJS support.
+
+### v0.2 Jun, 2019
+
+1. Add macOS CI.
 
 ### v0.1 Oct, 2017
 
