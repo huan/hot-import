@@ -1,6 +1,7 @@
 /* eslint no-whitespace-before-property: off */
 /* eslint import/export: off */
 /* eslint no-useless-return: off */
+/* eslint no-redeclare: off */
 
 import * as fs      from 'fs'
 import * as path    from 'path'
@@ -8,7 +9,7 @@ import * as path    from 'path'
 import { log }        from 'brolog'
 import callsites      from 'callsites'
 
-export { VERSION } from './version'
+export { VERSION } from './version.js'
 
 export interface KVStore {
   [id: string]: any

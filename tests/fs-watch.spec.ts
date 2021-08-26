@@ -3,7 +3,7 @@ import * as fs    from 'fs'
 import * as path  from 'path'
 
 // tslint:disable:no-shadowed-variable
-import * as test  from 'blue-tape'
+import { test } from 'tstest'
 
 import { log } from 'brolog'
 // log.level('silly')
@@ -11,14 +11,14 @@ import { log } from 'brolog'
 import {
   changingVariableModuleFixtures,
   tmpDir,
-}                                   from './fixtures'
+}                                   from './fixtures.js'
 
 const FILENAME = 'test.data'
 
 async function write (file: string, data: string | number): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     log.verbose('TestFsWatch', 'write(%s) ...', file)
-    fs.writeFile(file, data, err => {
+    fs.writeFile(file, String(data), err => {
       if (err) {
         return reject(err)
       }
@@ -73,7 +73,7 @@ test('1/4. fs.writeFileSync then fs.writeFile', async t => {
     const file = path.join(workDir, FILENAME)
 
     // init the file
-    fs.writeFileSync(file, Math.random())
+    fs.writeFileSync(file, '' + Math.random())
     await new Promise(setImmediate)
 
     watcher = await watch(
@@ -105,7 +105,7 @@ test('2/4. fs.writeFileSync then fs.writeFileSync', async t => {
     const file = path.join(workDir, FILENAME)
 
     // init the file
-    fs.writeFileSync(file, Math.random())
+    fs.writeFileSync(file, '' + Math.random())
     await new Promise(setImmediate)
 
     watcher = await watch(
@@ -115,7 +115,7 @@ test('2/4. fs.writeFileSync then fs.writeFileSync', async t => {
     )
 
     // change the file
-    fs.writeFileSync(file, Math.random())
+    fs.writeFileSync(file, '' + Math.random())
   }
   await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -182,7 +182,7 @@ test('4/4. fs.writeFile then fs.writeFileSync', async t => {
     )
 
     // change the file
-    fs.writeFileSync(file, Math.random())
+    fs.writeFileSync(file, '' + Math.random())
   }
   await new Promise(resolve => setTimeout(resolve, 10))
 

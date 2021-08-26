@@ -1,8 +1,8 @@
 #!/usr/bin/env ts-node
-import * as path  from 'path'
+import path from 'path'
 
 // tslint:disable:no-shadowed-variable
-import * as test  from 'blue-tape'
+import { test } from 'tstest'
 
 // import { log } from 'brolog'
 // log.level('silly')
@@ -10,10 +10,10 @@ import * as test  from 'blue-tape'
 import {
   callerResolve,
   // makeCold,
-}                 from '../src/hot-import'
-import hotImport  from '../'
+}                 from '../src/hot-import.js'
+import hotImport  from '../src/mod.js'
 
-const MODULE_RELATIVE_PATH = './fixtures/meaning-of-life'
+const MODULE_RELATIVE_PATH = './fixtures/meaning-of-life.js'
 
 test('hotImport', async t => {
   const hotMod = await hotImport(MODULE_RELATIVE_PATH)

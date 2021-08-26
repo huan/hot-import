@@ -1,15 +1,15 @@
-#!/usr/bin/env ts-node
-import * as path  from 'path'
+#!/usr/bin/env node --loader ts-node/esm
+/* eslint no-unreachable-loop: off */
+import path from 'path'
 
-// tslint:disable:no-shadowed-variable
-import * as test  from 'blue-tape'
+import { test } from 'tstest'
 
 import {
   changingClassModuleFixtures,
   changingRawFuncModuleFixtures,
   changingVariableModuleFixtures,
   emptyObjectModuleFixture,
-}                           from '../tests/fixtures'
+}                                   from '../tests/fixtures.js'
 
 import {
   callerResolve,
@@ -27,7 +27,7 @@ import {
   refreshImport,
   // restoreRequireCache,
   VERSION,
-}                           from './hot-import'
+}                           from './hot-import.js'
 
 // import { log }      from 'brolog'
 // log.level('silly')
@@ -40,15 +40,15 @@ test('callerResolve()', async t => {
     __dirname,
     RELATIVE_FILE_PATH,
   )
-  t.test('relative file path', async t => {
+  void t.test('relative file path', async t => {
     const filePath = callerResolve(RELATIVE_FILE_PATH)
     t.equal(filePath, ABSOLUTE_FILE_PATH, 'should turn relative to absolute')
   })
-  t.test('absolute file path', async t => {
+  void t.test('absolute file path', async t => {
     const filePath = callerResolve(ABSOLUTE_FILE_PATH)
     t.equal(filePath, ABSOLUTE_FILE_PATH, 'should keep absolute as it is')
   })
-  t.test('callerExceptFile', async t => {
+  void t.test('callerExceptFile', async t => {
     const filePath = callerResolve(RELATIVE_FILE_PATH, __filename)
     // console.log(filePath)
     t.assert(filePath.endsWith(path.join( // cross platform: compatible with windows
@@ -69,7 +69,7 @@ test('newCall()', async t => {
 })
 
 test('hotImport()', async t => {
-  t.test('class module(export=)', async t => {
+  void t.test('class module(export=)', async t => {
     let file, Cls
     for await (const info of changingClassModuleFixtures()) {
       /**
@@ -96,7 +96,7 @@ test('hotImport()', async t => {
     }
   })
 
-  t.test('variable module(export const answer=)', async t => {
+  void t.test('variable module(export const answer=)', async t => {
     let file, hotMod
     for await (const info of changingVariableModuleFixtures()) {
       /**
@@ -121,7 +121,7 @@ test('hotImport()', async t => {
     }
   })
 
-  t.test('raw export module(export = () => "value")', async t => {
+  void t.test('raw export module(export = () => "value")', async t => {
     let file, hotMod
     for await (const info of changingRawFuncModuleFixtures()) {
       /**
@@ -146,7 +146,7 @@ test('hotImport()', async t => {
     }
   })
 
-  t.test('module that only has a default export', async t => {
+  void t.test('module that only has a default export', async t => {
     const EXPECTED_RETURN_VALUE = 42
     const DEFAULT_EXPORT_ONLY_MODULE_FILE = '../tests/fixtures/default-export-module'
     const mod = await hotImport(DEFAULT_EXPORT_ONLY_MODULE_FILE)
@@ -157,14 +157,14 @@ test('hotImport()', async t => {
 })
 
 test('importFile()', async t => {
-  t.test('const value', async t => {
+  void t.test('const value', async t => {
     for await (const info of changingVariableModuleFixtures()) {
       const hotMod = await importFile(info.file)
       t.equal(hotMod.answer, info.returnValue, 'should import file right with returned value ' + info.returnValue)
       break // only test once for importFile
     }
   })
-  t.test('class', async t => {
+  void t.test('class', async t => {
     for await (const info of changingClassModuleFixtures()) {
       const Module = await importFile(info.file)
       const result = new Module(EXPECTED_TEXT)
@@ -213,13 +213,13 @@ test('cloneProperties()', async t => {
   /* eslint padded-blocks: off */
   const SRC_CLASS = class { constructor (public text: string) {} }
 
-  t.test('object', async t => {
+  void t.test('object', async t => {
     const dst = {} as any
     cloneProperties(dst, SRC)
     t.equal(dst.text, EXPECTED_TEXT, 'should clone the text property')
   })
 
-  t.test('class', async t => {
+  void t.test('class', async t => {
     const dst = {} as any
     cloneProperties(dst, SRC_CLASS)
     t.equal(SRC_CLASS.prototype, dst.prototype, 'should clone the prototype for class')

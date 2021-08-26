@@ -2,8 +2,17 @@
   "name": "hot-import",
   "version": "0.3.0",
   "description": "Hot Module Replacement (HMR) for Node.js",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/src/mod.js",
+      "require": "./dist/cjs/src/mod.js"
+    }
+  },
+  "typings": "./dist/esm/src/mod.d.ts",
+  "engines": {
+    "node": ">=14"
+  },
   "directories": {
     "doc": "docs",
     "test": "tests"
@@ -14,12 +23,13 @@
     "demo": "npm run demo:ts",
     "demo:ts": "ts-node examples/demo-ts",
     "demo:js": "ts-node examples/demo-js",
-    "dist": "npm run clean && tsc",
+    "dist": "npm run clean && tsc && tsc -p tsconfig.cjs.json && npm run fixup",
+    "fixup": "echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
     "lint": "npm run lint:es && npm run clean && tsc --noEmit",
     "lint:es": "eslint 'src/**/*.ts' 'tests/**/*.spec.ts' --ignore-pattern tests/fixtures/",
     "test": "npm run lint && npm run check-node-version && npm run test:unit",
     "test:pack": "bash -x scripts/npm-pack-testing.sh",
-    "test:unit": "blue-tape -r ts-node/register \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\""
+    "test:unit": "tap --node-arg=--loader=ts-node/esm \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\""
   },
   "repository": {
     "type": "git",
@@ -43,10 +53,10 @@
     "callsites": "^3.0.0"
   },
   "devDependencies": {
-    "@chatie/eslint-config": "^0.8.1",
+    "@chatie/eslint-config": "^0.13.5",
     "@chatie/git-scripts": "^0.2.5",
     "@chatie/semver": "^0.4.7",
-    "@chatie/tsconfig": "^0.6.1",
+    "@chatie/tsconfig": "^0.17.2",
     "@types/rimraf": "^2.0.2",
     "check-node-version": "^4.0.0",
     "cross-env": "^7.0.0",
@@ -54,7 +64,7 @@
     "rimraf": "^3.0.0",
     "shx": "^0.3.2",
     "source-map-support": "^0.5.8",
-    "tstest": "^0.4.2"
+    "tstest": "^0.5.16"
   },
   "files": [
     "bin/",
@@ -65,9 +75,6 @@
     "package.json",
     "README.md"
   ],
-  "engines": {
-    "node": ">= 7"
-  },
   "publishConfig": {
     "access": "public",
     "tag": "next"
