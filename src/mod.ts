@@ -1,12 +1,16 @@
 import {
-  hotImport,
-}                 from './hot-import.js'
-
-export {
   callerResolve,
   hotImport,
   log,
-  VERSION,
 }                 from './hot-import.js'
+import {
+  VERSION,
+}                 from './version'
 
+export {
+  VERSION,
+  callerResolve,
+  hotImport,
+  log,
+}
 export default hotImport

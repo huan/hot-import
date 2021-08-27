@@ -9,8 +9,6 @@ import * as path    from 'path'
 import { log }        from 'brolog'
 import callsites      from 'callsites'
 
-export { VERSION } from './version.js'
-
 export interface KVStore {
   [id: string]: any
 }

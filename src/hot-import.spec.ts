@@ -185,7 +185,7 @@ test('refreshImport()', async t => {
       proxyStore[info.file]  = initProxyModule(info.file)
     } else {
       await refreshImport(info.file)
-      t.notEqual(moduleStore[info.file], cls, 'should be refreshed to new value')
+      t.not(moduleStore[info.file], cls, 'should be refreshed to new value')
     }
   }
 })
@@ -195,7 +195,7 @@ test('purgeRequireCache()', async t => {
   const VAL = 'test-val'
   for (const info of emptyObjectModuleFixture()) {
     const m0 = await importFile(info.file)
-    t.deepEqual(m0, info.returnValue, 'should get returnValue from module')
+    t.same(m0, info.returnValue, 'should get returnValue from module')
 
     m0[KEY] = VAL
     const m1 = await importFile(info.file)
@@ -203,7 +203,7 @@ test('purgeRequireCache()', async t => {
 
     purgeRequireCache(info.file)
     const m2 = await importFile(info.file)
-    t.deepEqual(m2, info.returnValue, 'should get returnValue again after purge')
+    t.same(m2, info.returnValue, 'should get returnValue again after purge')
     t.equal(m2[KEY], undefined, 'should no KEY exists any more')
   }
 })
