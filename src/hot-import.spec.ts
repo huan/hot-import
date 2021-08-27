@@ -26,7 +26,6 @@ import {
   purgeRequireCache,
   refreshImport,
   // restoreRequireCache,
-  VERSION,
 }                           from './hot-import.js'
 
 // import { log }      from 'brolog'
@@ -224,9 +223,4 @@ test('cloneProperties()', async t => {
     cloneProperties(dst, SRC_CLASS)
     t.equal(SRC_CLASS.prototype, dst.prototype, 'should clone the prototype for class')
   })
-})
-
-test('VERSION', async t => {
-  t.ok(VERSION.match(/^\d+\.\d+\.\d+$/), 'should get semver version')
-  t.equal(VERSION, '0.0.0', 'should be 0.0.0 in source code')
 })
