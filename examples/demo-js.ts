@@ -2,12 +2,12 @@ import * as assert  from 'assert'
 import * as fs      from 'fs'
 import * as path    from 'path'
 
-import hotImport  from '../'
+import hotImport  from '../src/mod.js'
 
 // import { log } from 'brolog'
 // log.level('silly')
 
-async function main() {
+async function main () {
   const MODULE_CODE_42 = 'module.exports = () => 42'
   const MODULE_CODE_17 = 'module.exports.default = () => 17'
 

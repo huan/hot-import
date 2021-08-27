@@ -2,7 +2,7 @@ import * as assert  from 'assert'
 import * as fs      from 'fs'
 import * as path    from 'path'
 
-import hotImport  from '../'
+import hotImport  from '../src/mod.js'
 
 // import { log } from 'brolog'
 // log.level('silly')

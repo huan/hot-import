@@ -1,8 +1,3 @@
-// https://github.com/Microsoft/TypeScript/issues/14151#issuecomment-280812617
-if (!(<any>Symbol).asyncIterator) {
-  (<any>Symbol).asyncIterator = Symbol.for('Symbol.asyncIterator')
-}
-
 import * as fs    from 'fs'
 import * as os    from 'os'
 import * as path  from 'path'
@@ -14,7 +9,7 @@ export interface ModuleInfo {
   returnValue : any,
 }
 
-export function* emptyObjectModuleFixture(): IterableIterator<ModuleInfo> {
+export function * emptyObjectModuleFixture (): IterableIterator<ModuleInfo> {
   for (const workDir of tmpDir()) {
     const moduleFile = path.join(
       workDir,
